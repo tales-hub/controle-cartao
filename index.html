@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f1115">
+<title>Controle do Cartão</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d212a; --line:#2a2f3a;
+    --txt:#e8eaed; --muted:#9aa1ad;
+    --ok:#3fb27f; --warn:#e0a458; --bad:#e05e5e; --accent:#6ea8fe;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f5f6f8; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea;
+           --txt:#16181d; --muted:#666e7a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+       -webkit-font-smoothing:antialiased;padding:24px 16px 56px}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 2px;font-weight:650;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:22px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+  .card .val{font-size:26px;font-weight:650;letter-spacing:-.02em;line-height:1.1}
+  .card .note{font-size:12px;color:var(--muted);margin-top:6px}
+  .big{grid-column:1/-1}
+  .barwrap{height:12px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:14px 0 8px;position:relative}
+  .bar{height:100%;border-radius:99px;transition:width .4s}
+  .tick{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--muted);opacity:.65}
+  .legend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;
+          padding:7px 13px;border-radius:99px;margin-top:4px}
+  .dot{width:8px;height:8px;border-radius:99px;background:currentColor}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+     font-weight:600;margin:28px 0 10px;display:flex;justify-content:space-between;align-items:center}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+     color:var(--muted);font-weight:600;padding:0 10px 8px;border-bottom:1px solid var(--line)}
+  td{padding:11px 10px;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .day td{background:var(--panel2);font-weight:600;font-size:13px}
+  .who{font-size:11px;color:var(--muted);background:var(--panel2);
+       padding:2px 8px;border-radius:99px;margin-left:6px}
+  .tag-local{font-size:10px;color:var(--accent);border:1px solid var(--accent);
+       padding:1px 6px;border-radius:99px;margin-left:6px;opacity:.85}
+  .empty{color:var(--muted);font-size:14px;padding:26px;text-align:center;
+         border:1px dashed var(--line);border-radius:12px}
+  svg{display:block;width:100%;height:auto}
+  .foot{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6}
+  input,select,button{font:inherit;color:var(--txt);background:var(--panel2);
+       border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none}
+  input:focus,select:focus{border-color:var(--accent)}
+  input::placeholder{color:var(--muted)}
+  button{cursor:pointer;font-weight:600;background:var(--accent);color:#0b0e13;border-color:transparent}
+  button:active{transform:translateY(1px)}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500;
+       font-size:12px;padding:7px 12px;border-radius:99px}
+  .form{display:grid;grid-template-columns:1fr 120px 130px auto;gap:10px}
+  @media(max-width:640px){ .form{grid-template-columns:1fr 1fr} .form .f-desc{grid-column:1/-1} .form button{grid-column:1/-1} }
+  .del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:15px;line-height:1}
+  .del:hover{color:var(--bad)}
+  /* gate */
+  #gate{position:fixed;inset:0;background:var(--bg);z-index:99;display:flex;
+        align-items:center;justify-content:center;padding:20px}
+  #gate .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+        padding:28px;width:100%;max-width:320px;text-align:center}
+  #gate h3{margin:0 0 6px;font-size:17px}
+  #gate p{margin:0 0 18px;color:var(--muted);font-size:13px}
+  #gate input{width:100%;text-align:center;letter-spacing:.4em;font-size:18px;margin-bottom:10px}
+  #gate button{width:100%}
+  #gateErr{color:var(--bad);font-size:12px;height:16px;margin-top:8px}
+  #app{display:none}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <h3>Controle do Cartão</h3>
+    <p>Digite a senha para acessar</p>
+    <input id="pw" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••">
+    <button id="gateBtn">Entrar</button>
+    <div id="gateErr"></div>
+  </div>
+</div>
+
+<div id="app"><div class="wrap">
+
+<h1>Controle do Cartão</h1>
+<div class="sub" id="sub"></div>
+
+<div class="grid">
+  <div class="card big">
+    <div class="lbl">Disponível até o fechamento</div>
+    <div class="val" id="restante"></div>
+    <div class="barwrap"><div class="bar" id="bar"></div><div class="tick" id="tick"></div></div>
+    <div class="legend"><span id="gastoTxt"></span><span id="orcTxt"></span></div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Gasto por dia (restante)</div>
+    <div class="val" id="porDia"></div>
+    <div class="note" id="porDiaNote"></div>
+  </div>
+  <div class="card">
+    <div class="lbl">Média diária até agora</div>
+    <div class="val" id="media"></div>
+    <div class="note" id="mediaNote"></div>
+  </div>
+  <div class="card">
+    <div class="lbl">Projeção do ciclo</div>
+    <div class="val" id="proj"></div>
+    <div class="note" id="projNote"></div>
+  </div>
+</div>
+
+<h2>Lançar gasto</h2>
+<div class="card">
+  <div class="form">
+    <input class="f-desc" id="fDesc" placeholder="Descrição (ex: mercado)">
+    <input id="fValor" type="text" inputmode="decimal" placeholder="R$ 0,00">
+    <select id="fQuem"><option>Tales</option><option>Nicolle</option><option>Os dois</option></select>
+    <button id="fAdd">Adicionar</button>
+  </div>
+  <div class="note" style="margin-top:12px">
+    Lançamentos feitos aqui ficam salvos <b>só neste aparelho</b>. Para virarem oficiais nos dois celulares,
+    use “copiar para o chat” abaixo e cole na conversa com o Claude.
+  </div>
+</div>
+
+<h2>Ritmo do ciclo</h2>
+<div class="card"><div id="chart"></div></div>
+
+<h2>Lançamentos <button class="btn-ghost" id="copiar">copiar para o chat</button></h2>
+<div id="tabela"></div>
+
+<div class="foot" id="foot"></div>
+
+</div></div>
+
+<script>
+/* ====== DADOS OFICIAIS DO CICLO (atualizados pelo Claude) ====== */
+const ORCAMENTO   = 2000.00;
+const INICIO      = "2026-08-19";
+const FIM         = "2026-08-26";
+const ATUALIZADO  = "19/08/2026";
+const LANCAMENTOS = [
+  { data:"2026-08-19", desc:"Lavagem do carro", quem:"Nicolle", valor:105.00 },
+  { data:"2026-08-19", desc:"Barbeiro",         quem:"Tales",   valor:65.00 },
+];
+/* ============================================================== */
+
+/* ---------- porta de entrada (senha) ---------- */
+const PW_HASH = 1537279;   // hash simples da senha
+const h = s => { let x=0; for(const c of s) x=(x*31+c.charCodeAt(0))|0; return x; };
+const KEY_AUTH = 'cc_auth_v1', KEY_LOCAL = 'cc_local_v1';
+
+function abrir(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
+  render();
+}
+function tentar(){
+  const v=document.getElementById('pw').value.trim();
+  if(h(v)===PW_HASH){ try{localStorage.setItem(KEY_AUTH,'1')}catch(e){} abrir(); }
+  else { document.getElementById('gateErr').textContent='Senha incorreta'; document.getElementById('pw').value=''; }
+}
+document.getElementById('gateBtn').onclick=tentar;
+document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')tentar()});
+try{ if(localStorage.getItem(KEY_AUTH)==='1') abrir(); else document.getElementById('pw').focus(); }
+catch(e){ document.getElementById('pw').focus(); }
+
+/* ---------- utilidades ---------- */
+const brl = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const d   = s => new Date(s+"T12:00:00");
+const dias= (a,b) => Math.round((d(b)-d(a))/86400000);
+const iso = dt => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+const fmtD= s => d(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+
+function hojeClamp(){
+  const t = iso(new Date());
+  if (t < INICIO) return INICIO;
+  if (t > FIM)    return FIM;
+  return t;
+}
+function locais(){ try{ return JSON.parse(localStorage.getItem(KEY_LOCAL)||'[]') }catch(e){ return [] } }
+function salvarLocais(a){ try{ localStorage.setItem(KEY_LOCAL,JSON.stringify(a)) }catch(e){} }
+
+/* ---------- formulário ---------- */
+document.getElementById('fAdd').onclick=()=>{
+  const desc=document.getElementById('fDesc').value.trim();
+  const raw =document.getElementById('fValor').value.replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}\b)/g,'').replace(',','.');
+  const valor=parseFloat(raw);
+  if(!desc||!isFinite(valor)||valor<=0){ alert('Preencha a descrição e um valor válido.'); return; }
+  const a=locais();
+  a.push({data:hojeClamp(),desc,quem:document.getElementById('fQuem').value,valor:Math.round(valor*100)/100,local:true});
+  salvarLocais(a);
+  document.getElementById('fDesc').value=''; document.getElementById('fValor').value='';
+  render();
+};
+document.getElementById('copiar').onclick=()=>{
+  const a=locais();
+  if(!a.length){ alert('Não há lançamentos feitos neste aparelho para copiar.'); return; }
+  const txt=a.map(l=>`${fmtD(l.data)} — ${l.desc} — ${l.quem} — R$ ${l.valor.toFixed(2).replace('.',',')}`).join('\n');
+  const done=()=>alert('Copiado! Cole na conversa com o Claude para virar oficial.');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done,()=>prompt('Copie:',txt));
+  else prompt('Copie:',txt);
+};
+
+/* ---------- render ---------- */
+function render(){
+  const HOJE = hojeClamp();
+  const TODOS = LANCAMENTOS.map(l=>({...l})).concat(locais());
+
+  const totalDias     = dias(INICIO,FIM)+1;
+  const diasCorridos  = Math.min(Math.max(dias(INICIO,HOJE)+1,1),totalDias);
+  const diasRestantes = Math.max(totalDias-diasCorridos+1,1);
+  const gasto         = TODOS.reduce((s,l)=>s+l.valor,0);
+  const restante      = ORCAMENTO-gasto;
+  const media         = gasto/diasCorridos;
+  const projecao      = media*totalDias;
+  const porDia        = restante/diasRestantes;
+  const ritmoIdeal    = ORCAMENTO/totalDias;
+  const esperadoHoje  = ritmoIdeal*diasCorridos;
+  const pct           = Math.min(Math.max(gasto/ORCAMENTO*100,0),100);
+  const pctTempo      = diasCorridos/totalDias*100;
+
+  document.getElementById('sub').textContent =
+    `Ciclo ${fmtD(INICIO)} → ${fmtD(FIM)} · dia ${diasCorridos} de ${totalDias} · ${diasRestantes} dia(s) restante(s)`;
+  document.getElementById('restante').textContent = brl(restante);
+  document.getElementById('restante').style.color = restante<0?'var(--bad)':'';
+  document.getElementById('gastoTxt').textContent = `gasto ${brl(gasto)} (${pct.toFixed(0)}%)`;
+  document.getElementById('orcTxt').textContent   = `orçamento ${brl(ORCAMENTO)}`;
+
+  let cor='var(--ok)', rot='Dentro do previsto', txt=`abaixo do ritmo em ${brl(esperadoHoje-gasto)}`;
+  if (gasto > ORCAMENTO)              { cor='var(--bad)';  rot='Estourou o orçamento'; txt=`${brl(gasto-ORCAMENTO)} acima do limite`; }
+  else if (projecao > ORCAMENTO*1.02) { cor='var(--bad)';  rot='Acima do previsto';    txt=`projeção fecha ${brl(projecao-ORCAMENTO)} acima`; }
+  else if (gasto > esperadoHoje)      { cor='var(--warn)'; rot='Atenção';              txt=`${brl(gasto-esperadoHoje)} acima do ritmo ideal`; }
+
+  const bar=document.getElementById('bar');
+  bar.style.width=pct+'%'; bar.style.background=cor;
+  document.getElementById('tick').style.left=pctTempo+'%';
+  const st=document.getElementById('status');
+  st.style.color=cor; st.style.background='color-mix(in srgb, currentColor 14%, transparent)';
+  st.innerHTML=`<span class="dot"></span>${rot} — ${txt}`;
+
+  document.getElementById('porDia').textContent=brl(Math.max(porDia,0));
+  document.getElementById('porDia').style.color=restante<0?'var(--bad)':'';
+  document.getElementById('porDiaNote').textContent=`dividindo o que sobra por ${diasRestantes} dia(s)`;
+  document.getElementById('media').textContent=brl(media);
+  document.getElementById('mediaNote').textContent=`ritmo ideal: ${brl(ritmoIdeal)}/dia`;
+  document.getElementById('proj').textContent=brl(projecao);
+  document.getElementById('proj').style.color=projecao>ORCAMENTO?'var(--bad)':'var(--ok)';
+  document.getElementById('projNote').textContent=projecao>ORCAMENTO
+    ? `${brl(projecao-ORCAMENTO)} acima do orçamento` : `${brl(ORCAMENTO-projecao)} de folga`;
+
+  /* gráfico */
+  (function(){
+    const W=760,H=220,ML=58,MR=14,MT=14,MB=30, iw=W-ML-MR, ih=H-MT-MB;
+    const acum=[]; let s=0;
+    for(let i=0;i<totalDias;i++){
+      const isoD=iso(new Date(d(INICIO).getTime()+i*86400000));
+      if(dias(INICIO,isoD)+1<=diasCorridos){
+        s+=TODOS.filter(l=>l.data===isoD).reduce((a,b)=>a+b.valor,0);
+        acum.push({i,v:s});
+      }
+    }
+    const maxY=Math.max(ORCAMENTO,gasto)*1.05;
+    const x=i=>ML+(totalDias<=1?0:i/(totalDias-1)*iw);
+    const y=v=>MT+ih-(v/maxY)*ih;
+    let g='';
+    [0,.25,.5,.75,1].forEach(f=>{ const v=maxY*f;
+      g+=`<line x1="${ML}" y1="${y(v)}" x2="${W-MR}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`+
+         `<text x="${ML-8}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)">${(v/1000).toFixed(1).replace('.',',')}k</text>`;});
+    g+=`<line x1="${x(0)}" y1="${y(ritmoIdeal)}" x2="${x(totalDias-1)}" y2="${y(ORCAMENTO)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    g+=`<text x="${x(totalDias-1)}" y="${y(ORCAMENTO)-8}" text-anchor="end" font-size="10" fill="var(--muted)">ritmo ideal</text>`;
+    if(acum.length){
+      g+=`<polyline points="${acum.map(p=>`${x(p.i)},${y(p.v)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      acum.forEach(p=>{g+=`<circle cx="${x(p.i)}" cy="${y(p.v)}" r="3.5" fill="${cor}"/>`});
+    }
+    for(let i=0;i<totalDias;i++){
+      const dia=new Date(d(INICIO).getTime()+i*86400000);
+      g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${String(dia.getDate()).padStart(2,'0')}</text>`;
+    }
+    document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gasto acumulado comparado ao ritmo ideal">${g}</svg>`;
+  })();
+
+  /* tabela */
+  (function(){
+    const el=document.getElementById('tabela');
+    if(!TODOS.length){ el.innerHTML='<div class="empty">Nenhum gasto lançado ainda.</div>'; return; }
+    const porData={};
+    TODOS.forEach(l=>{(porData[l.data]=porData[l.data]||[]).push(l)});
+    let hh='<div class="card" style="padding:6px 4px"><table><thead><tr><th>Descrição</th><th class="num">Valor</th></tr></thead><tbody>';
+    Object.keys(porData).sort().reverse().forEach(dt=>{
+      const tot=porData[dt].reduce((s,l)=>s+l.valor,0);
+      hh+=`<tr class="day"><td>${d(dt).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</td><td class="num">${brl(tot)}</td></tr>`;
+      porData[dt].forEach(l=>{
+        const li = l.local ? locais().findIndex(z=>z.data===l.data&&z.desc===l.desc&&z.valor===l.valor&&z.quem===l.quem) : -1;
+        hh+=`<tr><td>${l.desc}<span class="who">${l.quem}</span>${l.local?'<span class="tag-local">neste aparelho</span>':''}</td>`+
+            `<td class="num">${brl(l.valor)}${li>=0?` <button class="del" data-i="${li}" title="remover">×</button>`:''}</td></tr>`;
+      });
+    });
+    el.innerHTML=hh+'</tbody></table></div>';
+    el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
+      const a=locais(); a.splice(+b.dataset.i,1); salvarLocais(a); render();
+    });
+  })();
+
+  document.getElementById('foot').innerHTML =
+    `Ciclo do cartão fecha dia 26 de cada mês · orçamento de ${brl(ORCAMENTO)}.<br>`+
+    `Dados oficiais atualizados em ${ATUALIZADO} pelo Claude.<br>`+
+    `A senha desta página só evita curiosos — não é criptografia. Não guarde nada sigiloso aqui.`;
+}
+</script>
+</body>
+</html>
