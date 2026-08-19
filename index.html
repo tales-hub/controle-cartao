@@ -7,13 +7,14 @@
 <title>Controle do Cartão</title>
 <style>
   :root{
-    --bg:#0f1115; --panel:#171a21; --panel2:#1d212a; --line:#2a2f3a;
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d212a; --line:#2a2f3a; --band:#212734;
     --txt:#e8eaed; --muted:#9aa1ad;
     --ok:#3fb27f; --warn:#e0a458; --bad:#e05e5e; --accent:#6ea8fe;
   }
   @media (prefers-color-scheme: light){
-    :root{ --bg:#f5f6f8; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea;
-           --txt:#16181d; --muted:#666e7a; }
+    :root{ --bg:#f5f6f8; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --band:#eef1f6;
+           --txt:#16181d; --muted:#5d646f;
+           --ok:#15794f; --warn:#8a5a10; --bad:#c0392b; --accent:#1f66d0; }
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);
@@ -21,22 +22,25 @@
        -webkit-font-smoothing:antialiased;padding:24px 16px 56px}
   .wrap{max-width:860px;margin:0 auto}
   h1{font-size:20px;margin:0 0 2px;font-weight:650;letter-spacing:-.01em}
-  .sub{color:var(--muted);font-size:13px;margin-bottom:22px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:6px}
+  .rule{display:inline-block;font-size:12px;color:var(--muted);background:var(--panel2);
+        border:1px solid var(--line);border-radius:99px;padding:5px 12px;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
   .card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
   .card .val{font-size:26px;font-weight:650;letter-spacing:-.02em;line-height:1.1}
-  .card .note{font-size:12px;color:var(--muted);margin-top:6px}
+  .card .note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45}
   .big{grid-column:1/-1}
-  .barwrap{height:12px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:14px 0 8px;position:relative}
+  .barwrap{height:12px;background:var(--panel2);border-radius:99px;overflow:visible;margin:14px 0 8px;position:relative}
+  .barfill{position:absolute;inset:0;border-radius:99px;overflow:hidden}
   .bar{height:100%;border-radius:99px;transition:width .4s}
-  .tick{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--muted);opacity:.65}
-  .legend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .tick{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--txt);opacity:.55;border-radius:2px}
+  .legend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);gap:12px}
   .status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;
-          padding:7px 13px;border-radius:99px;margin-top:4px}
-  .dot{width:8px;height:8px;border-radius:99px;background:currentColor}
+          padding:7px 13px;border-radius:99px;margin-top:8px}
+  .dot{width:8px;height:8px;border-radius:99px;background:currentColor;flex:none}
   h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
-     font-weight:600;margin:28px 0 10px;display:flex;justify-content:space-between;align-items:center}
+     font-weight:600;margin:28px 0 10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
   table{width:100%;border-collapse:collapse;font-size:14px}
   th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;
      color:var(--muted);font-weight:600;padding:0 10px 8px;border-bottom:1px solid var(--line)}
@@ -44,19 +48,25 @@
   tr:last-child td{border-bottom:none}
   .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   .day td{background:var(--panel2);font-weight:600;font-size:13px}
+  .day .fds{font-size:10px;color:var(--accent);border:1px solid var(--accent);
+     padding:1px 6px;border-radius:99px;margin-left:8px;font-weight:600;vertical-align:1px}
   .who{font-size:11px;color:var(--muted);background:var(--panel2);
        padding:2px 8px;border-radius:99px;margin-left:6px}
   .tag-local{font-size:10px;color:var(--accent);border:1px solid var(--accent);
-       padding:1px 6px;border-radius:99px;margin-left:6px;opacity:.85}
+       padding:1px 6px;border-radius:99px;margin-left:6px}
   .empty{color:var(--muted);font-size:14px;padding:26px;text-align:center;
          border:1px dashed var(--line);border-radius:12px}
-  svg{display:block;width:100%;height:auto}
+  svg{display:block;width:100%;height:auto;touch-action:none}
+  .chartlegend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);
+       margin:2px 0 12px;padding-left:2px}
+  .chartlegend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:14px;height:3px;border-radius:2px;flex:none}
   .foot{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6}
   input,select,button{font:inherit;color:var(--txt);background:var(--panel2);
        border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none}
   input:focus,select:focus{border-color:var(--accent)}
   input::placeholder{color:var(--muted)}
-  button{cursor:pointer;font-weight:600;background:var(--accent);color:#0b0e13;border-color:transparent}
+  button{cursor:pointer;font-weight:600;background:var(--accent);color:#fff;border-color:transparent}
   button:active{transform:translateY(1px)}
   .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500;
        font-size:12px;padding:7px 12px;border-radius:99px}
@@ -64,7 +74,12 @@
   @media(max-width:640px){ .form{grid-template-columns:1fr 1fr} .form .f-desc{grid-column:1/-1} .form button{grid-column:1/-1} }
   .del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:15px;line-height:1}
   .del:hover{color:var(--bad)}
-  /* gate */
+  #chartWrap{position:relative}
+  #tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .12s;
+       background:var(--panel);border:1px solid var(--line);border-radius:10px;
+       padding:9px 11px;font-size:12px;line-height:1.6;white-space:nowrap;
+       box-shadow:0 6px 20px rgba(0,0,0,.22);z-index:5}
+  #tip b{font-weight:650}
   #gate{position:fixed;inset:0;background:var(--bg);z-index:99;display:flex;
         align-items:center;justify-content:center;padding:20px}
   #gate .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;
@@ -93,25 +108,26 @@
 
 <h1>Controle do Cartão</h1>
 <div class="sub" id="sub"></div>
+<div class="rule" id="regra"></div>
 
 <div class="grid">
   <div class="card big">
     <div class="lbl">Disponível até o fechamento</div>
     <div class="val" id="restante"></div>
-    <div class="barwrap"><div class="bar" id="bar"></div><div class="tick" id="tick"></div></div>
+    <div class="barwrap"><div class="barfill"><div class="bar" id="bar"></div></div><div class="tick" id="tick"></div></div>
     <div class="legend"><span id="gastoTxt"></span><span id="orcTxt"></span></div>
     <div class="status" id="status"></div>
   </div>
 
   <div class="card">
-    <div class="lbl">Gasto por dia (restante)</div>
-    <div class="val" id="porDia"></div>
-    <div class="note" id="porDiaNote"></div>
+    <div class="lbl">Ainda dá para gastar hoje</div>
+    <div class="val" id="hoje"></div>
+    <div class="note" id="hojeNote"></div>
   </div>
   <div class="card">
-    <div class="lbl">Média diária até agora</div>
-    <div class="val" id="media"></div>
-    <div class="note" id="mediaNote"></div>
+    <div class="lbl">Reservado p/ fim de semana</div>
+    <div class="val" id="fds"></div>
+    <div class="note" id="fdsNote"></div>
   </div>
   <div class="card">
     <div class="lbl">Projeção do ciclo</div>
@@ -135,7 +151,14 @@
 </div>
 
 <h2>Ritmo do ciclo</h2>
-<div class="card"><div id="chart"></div></div>
+<div class="card">
+  <div class="chartlegend">
+    <span><i class="swatch" id="sw1"></i> gasto acumulado</span>
+    <span><i class="swatch" style="background:var(--muted);opacity:.8"></i> plano (40% no fim de semana)</span>
+    <span><i class="swatch" style="background:var(--band);height:10px;width:10px;border-radius:3px"></i> sábado e domingo</span>
+  </div>
+  <div id="chartWrap"><div id="chart"></div><div id="tip"></div></div>
+</div>
 
 <h2>Lançamentos <button class="btn-ghost" id="copiar">copiar para o chat</button></h2>
 <div id="tabela"></div>
@@ -149,6 +172,7 @@
 const ORCAMENTO   = 2000.00;
 const INICIO      = "2026-08-19";
 const FIM         = "2026-08-26";
+const PESO_FDS    = 0.40;          // 40% do orçamento nos dias de fim de semana
 const ATUALIZADO  = "19/08/2026";
 const LANCAMENTOS = [
   { data:"2026-08-19", desc:"Lavagem do carro", quem:"Nicolle", valor:105.00 },
@@ -156,20 +180,17 @@ const LANCAMENTOS = [
 ];
 /* ============================================================== */
 
-/* ---------- porta de entrada (senha) ---------- */
-const PW_HASH = 1537279;   // hash simples da senha
-const h = s => { let x=0; for(const c of s) x=(x*31+c.charCodeAt(0))|0; return x; };
-const KEY_AUTH = 'cc_auth_v1', KEY_LOCAL = 'cc_local_v1';
-
-function abrir(){
-  document.getElementById('gate').style.display='none';
-  document.getElementById('app').style.display='block';
-  render();
-}
+/* ---------- porta de entrada ---------- */
+const PW_HASH = 1537279;
+const hs = s => { let x=0; for(const c of s) x=(x*31+c.charCodeAt(0))|0; return x; };
+const KEY_AUTH='cc_auth_v1', KEY_LOCAL='cc_local_v1';
+function abrir(){ document.getElementById('gate').style.display='none';
+                  document.getElementById('app').style.display='block'; render(); }
 function tentar(){
   const v=document.getElementById('pw').value.trim();
-  if(h(v)===PW_HASH){ try{localStorage.setItem(KEY_AUTH,'1')}catch(e){} abrir(); }
-  else { document.getElementById('gateErr').textContent='Senha incorreta'; document.getElementById('pw').value=''; }
+  if(hs(v)===PW_HASH){ try{localStorage.setItem(KEY_AUTH,'1')}catch(e){} abrir(); }
+  else { document.getElementById('gateErr').textContent='Senha incorreta';
+         document.getElementById('pw').value=''; }
 }
 document.getElementById('gateBtn').onclick=tentar;
 document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')tentar()});
@@ -179,23 +200,32 @@ catch(e){ document.getElementById('pw').focus(); }
 /* ---------- utilidades ---------- */
 const brl = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const d   = s => new Date(s+"T12:00:00");
-const dias= (a,b) => Math.round((d(b)-d(a))/86400000);
+const difDias = (a,b) => Math.round((d(b)-d(a))/86400000);
 const iso = dt => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-const fmtD= s => d(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+const fmtD = s => d(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+const ehFds = s => { const w=d(s).getDay(); return w===0||w===6; };
 
-function hojeClamp(){
-  const t = iso(new Date());
-  if (t < INICIO) return INICIO;
-  if (t > FIM)    return FIM;
-  return t;
+const DIAS = (()=>{ const n=difDias(INICIO,FIM)+1, a=[];
+  for(let i=0;i<n;i++) a.push(iso(new Date(d(INICIO).getTime()+i*86400000))); return a; })();
+const N_FDS   = DIAS.filter(ehFds).length;
+const N_UTEIS = DIAS.length - N_FDS;
+
+/* fração do orçamento destinada a um dia */
+function frac(s){
+  if(N_FDS===0 || N_UTEIS===0) return 1/DIAS.length;      // ciclo só com um tipo de dia
+  return ehFds(s) ? PESO_FDS/N_FDS : (1-PESO_FDS)/N_UTEIS;
 }
+const cota = s => ORCAMENTO*frac(s);
+
+function hojeClamp(){ const t=iso(new Date());
+  return t<INICIO ? INICIO : (t>FIM ? FIM : t); }
 function locais(){ try{ return JSON.parse(localStorage.getItem(KEY_LOCAL)||'[]') }catch(e){ return [] } }
 function salvarLocais(a){ try{ localStorage.setItem(KEY_LOCAL,JSON.stringify(a)) }catch(e){} }
 
 /* ---------- formulário ---------- */
 document.getElementById('fAdd').onclick=()=>{
   const desc=document.getElementById('fDesc').value.trim();
-  const raw =document.getElementById('fValor').value.replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}\b)/g,'').replace(',','.');
+  const raw=document.getElementById('fValor').value.replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}\b)/g,'').replace(',','.');
   const valor=parseFloat(raw);
   if(!desc||!isFinite(valor)||valor<=0){ alert('Preencha a descrição e um valor válido.'); return; }
   const a=locais();
@@ -208,115 +238,190 @@ document.getElementById('copiar').onclick=()=>{
   const a=locais();
   if(!a.length){ alert('Não há lançamentos feitos neste aparelho para copiar.'); return; }
   const txt=a.map(l=>`${fmtD(l.data)} — ${l.desc} — ${l.quem} — R$ ${l.valor.toFixed(2).replace('.',',')}`).join('\n');
-  const done=()=>alert('Copiado! Cole na conversa com o Claude para virar oficial.');
-  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done,()=>prompt('Copie:',txt));
+  const ok=()=>alert('Copiado! Cole na conversa com o Claude para virar oficial.');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok,()=>prompt('Copie:',txt));
   else prompt('Copie:',txt);
 };
 
 /* ---------- render ---------- */
 function render(){
-  const HOJE = hojeClamp();
+  const HOJE  = hojeClamp();
   const TODOS = LANCAMENTOS.map(l=>({...l})).concat(locais());
+  const iHoje = difDias(INICIO,HOJE);                       // índice de hoje (0-based)
 
-  const totalDias     = dias(INICIO,FIM)+1;
-  const diasCorridos  = Math.min(Math.max(dias(INICIO,HOJE)+1,1),totalDias);
-  const diasRestantes = Math.max(totalDias-diasCorridos+1,1);
-  const gasto         = TODOS.reduce((s,l)=>s+l.valor,0);
-  const restante      = ORCAMENTO-gasto;
-  const media         = gasto/diasCorridos;
-  const projecao      = media*totalDias;
-  const porDia        = restante/diasRestantes;
-  const ritmoIdeal    = ORCAMENTO/totalDias;
-  const esperadoHoje  = ritmoIdeal*diasCorridos;
-  const pct           = Math.min(Math.max(gasto/ORCAMENTO*100,0),100);
-  const pctTempo      = diasCorridos/totalDias*100;
+  const gasto     = TODOS.reduce((s,l)=>s+l.valor,0);
+  const restante  = ORCAMENTO-gasto;
+  const gastoHoje = TODOS.filter(l=>l.data===HOJE).reduce((s,l)=>s+l.valor,0);
+
+  /* plano acumulado e comparação */
+  const planoAcum = [];                                      // esperado ao fim de cada dia
+  let acc=0; DIAS.forEach(s=>{ acc+=cota(s); planoAcum.push(acc); });
+  const esperadoHoje = planoAcum[iHoje];
+
+  /* redistribuição: o que sobra vai para os dias que faltam, com os mesmos pesos.
+     dispRest = orçamento menos o que já foi gasto ANTES de hoje (hoje ainda tem cota a usar) */
+  const restantesDias = DIAS.slice(iHoje);
+  const fracRest = restantesDias.reduce((s,x)=>s+frac(x),0);
+  const dispRest = restante + gastoHoje;
+  const cotaHojeAj = fracRest>0 ? dispRest*frac(HOJE)/fracRest : 0;
+  const podeHoje   = cotaHojeAj - gastoHoje;                 // pode ser negativo = estourou a cota do dia
+
+  /* dias seguintes ficam com o que sobra depois da cota de hoje */
+  const futuros    = DIAS.slice(iHoje+1);
+  const fracFuturo = futuros.reduce((s,x)=>s+frac(x),0);
+  const sobraFuturo= restante - Math.max(podeHoje,0);
+  const reserva    = s => fracFuturo>0 ? sobraFuturo*frac(s)/fracFuturo : 0;
+  const fdsDatas   = (ehFds(HOJE)?[HOJE]:[]).concat(futuros.filter(ehFds));
+  const fdsRestante= (ehFds(HOJE)?Math.max(podeHoje,0):0)
+                   + futuros.filter(ehFds).reduce((s,x)=>s+reserva(x),0);
+
+  const pctGasto     = Math.min(Math.max(gasto/ORCAMENTO*100,0),100);
+  const pctEsperado  = Math.min(Math.max(esperadoHoje/ORCAMENTO*100,0),100);
 
   document.getElementById('sub').textContent =
-    `Ciclo ${fmtD(INICIO)} → ${fmtD(FIM)} · dia ${diasCorridos} de ${totalDias} · ${diasRestantes} dia(s) restante(s)`;
+    `Ciclo ${fmtD(INICIO)} → ${fmtD(FIM)} · dia ${iHoje+1} de ${DIAS.length} · ${DIAS.length-iHoje} dia(s) restante(s)`;
+  document.getElementById('regra').textContent =
+    N_FDS>0 && N_UTEIS>0
+      ? `Plano: ${Math.round(PESO_FDS*100)}% do orçamento nos ${N_FDS} dia(s) de fim de semana (${brl(ORCAMENTO*PESO_FDS/N_FDS)}/dia) · ${Math.round((1-PESO_FDS)*100)}% nos ${N_UTEIS} dia(s) úteis (${brl(ORCAMENTO*(1-PESO_FDS)/N_UTEIS)}/dia)`
+      : `Plano: ${brl(ORCAMENTO/DIAS.length)} por dia`;
+
   document.getElementById('restante').textContent = brl(restante);
   document.getElementById('restante').style.color = restante<0?'var(--bad)':'';
-  document.getElementById('gastoTxt').textContent = `gasto ${brl(gasto)} (${pct.toFixed(0)}%)`;
+  document.getElementById('gastoTxt').textContent = `gasto ${brl(gasto)} (${pctGasto.toFixed(0)}%)`;
   document.getElementById('orcTxt').textContent   = `orçamento ${brl(ORCAMENTO)}`;
 
-  let cor='var(--ok)', rot='Dentro do previsto', txt=`abaixo do ritmo em ${brl(esperadoHoje-gasto)}`;
+  let cor='var(--ok)', rot='Dentro do plano', txt=`${brl(esperadoHoje-gasto)} abaixo do previsto para hoje`;
+  const projecao = esperadoHoje>0 ? ORCAMENTO*(gasto/esperadoHoje) : gasto;
   if (gasto > ORCAMENTO)              { cor='var(--bad)';  rot='Estourou o orçamento'; txt=`${brl(gasto-ORCAMENTO)} acima do limite`; }
-  else if (projecao > ORCAMENTO*1.02) { cor='var(--bad)';  rot='Acima do previsto';    txt=`projeção fecha ${brl(projecao-ORCAMENTO)} acima`; }
-  else if (gasto > esperadoHoje)      { cor='var(--warn)'; rot='Atenção';              txt=`${brl(gasto-esperadoHoje)} acima do ritmo ideal`; }
+  else if (projecao > ORCAMENTO*1.02) { cor='var(--bad)';  rot='Acima do plano';       txt=`no ritmo atual, fecha ${brl(projecao-ORCAMENTO)} acima`; }
+  else if (gasto > esperadoHoje)      { cor='var(--warn)'; rot='Atenção';              txt=`${brl(gasto-esperadoHoje)} acima do previsto para hoje`; }
 
   const bar=document.getElementById('bar');
-  bar.style.width=pct+'%'; bar.style.background=cor;
-  document.getElementById('tick').style.left=pctTempo+'%';
+  bar.style.width=pctGasto+'%'; bar.style.background=cor;
+  const tk=document.getElementById('tick');
+  tk.style.left=pctEsperado+'%';
+  tk.title=`o plano prevê ${brl(esperadoHoje)} gastos até hoje`;
   const st=document.getElementById('status');
   st.style.color=cor; st.style.background='color-mix(in srgb, currentColor 14%, transparent)';
   st.innerHTML=`<span class="dot"></span>${rot} — ${txt}`;
+  document.getElementById('sw1').style.background=cor;
 
-  document.getElementById('porDia').textContent=brl(Math.max(porDia,0));
-  document.getElementById('porDia').style.color=restante<0?'var(--bad)':'';
-  document.getElementById('porDiaNote').textContent=`dividindo o que sobra por ${diasRestantes} dia(s)`;
-  document.getElementById('media').textContent=brl(media);
-  document.getElementById('mediaNote').textContent=`ritmo ideal: ${brl(ritmoIdeal)}/dia`;
-  document.getElementById('proj').textContent=brl(projecao);
-  document.getElementById('proj').style.color=projecao>ORCAMENTO?'var(--bad)':'var(--ok)';
-  document.getElementById('projNote').textContent=projecao>ORCAMENTO
+  document.getElementById('hoje').textContent = brl(Math.max(podeHoje,0));
+  document.getElementById('hoje').style.color = podeHoje<=0?'var(--bad)':'';
+  document.getElementById('hojeNote').innerHTML =
+    `${ehFds(HOJE)?'<b>fim de semana</b>':'dia útil'} · cota do dia ${brl(cotaHojeAj)}` +
+    (gastoHoje>0 ? `<br>já lançado hoje: ${brl(gastoHoje)}` : '') +
+    (podeHoje<0 ? `<br><span style="color:var(--bad)">estourou a cota de hoje em ${brl(-podeHoje)}</span>` : '');
+
+  document.getElementById('fds').textContent = brl(Math.max(fdsRestante,0));
+  document.getElementById('fdsNote').textContent = fdsDatas.length
+    ? `${fdsDatas.map(fmtD).join(' e ')} · ${brl(Math.max(fdsRestante,0)/fdsDatas.length)} por dia`
+    : 'não há mais fim de semana neste ciclo';
+
+  document.getElementById('proj').textContent = brl(projecao);
+  document.getElementById('proj').style.color = projecao>ORCAMENTO?'var(--bad)':'var(--ok)';
+  document.getElementById('projNote').textContent = projecao>ORCAMENTO
     ? `${brl(projecao-ORCAMENTO)} acima do orçamento` : `${brl(ORCAMENTO-projecao)} de folga`;
 
-  /* gráfico */
-  (function(){
-    const W=760,H=220,ML=58,MR=14,MT=14,MB=30, iw=W-ML-MR, ih=H-MT-MB;
-    const acum=[]; let s=0;
-    for(let i=0;i<totalDias;i++){
-      const isoD=iso(new Date(d(INICIO).getTime()+i*86400000));
-      if(dias(INICIO,isoD)+1<=diasCorridos){
-        s+=TODOS.filter(l=>l.data===isoD).reduce((a,b)=>a+b.valor,0);
-        acum.push({i,v:s});
-      }
-    }
-    const maxY=Math.max(ORCAMENTO,gasto)*1.05;
-    const x=i=>ML+(totalDias<=1?0:i/(totalDias-1)*iw);
-    const y=v=>MT+ih-(v/maxY)*ih;
-    let g='';
-    [0,.25,.5,.75,1].forEach(f=>{ const v=maxY*f;
-      g+=`<line x1="${ML}" y1="${y(v)}" x2="${W-MR}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`+
-         `<text x="${ML-8}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)">${(v/1000).toFixed(1).replace('.',',')}k</text>`;});
-    g+=`<line x1="${x(0)}" y1="${y(ritmoIdeal)}" x2="${x(totalDias-1)}" y2="${y(ORCAMENTO)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
-    g+=`<text x="${x(totalDias-1)}" y="${y(ORCAMENTO)-8}" text-anchor="end" font-size="10" fill="var(--muted)">ritmo ideal</text>`;
-    if(acum.length){
-      g+=`<polyline points="${acum.map(p=>`${x(p.i)},${y(p.v)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linejoin="round"/>`;
-      acum.forEach(p=>{g+=`<circle cx="${x(p.i)}" cy="${y(p.v)}" r="3.5" fill="${cor}"/>`});
-    }
-    for(let i=0;i<totalDias;i++){
-      const dia=new Date(d(INICIO).getTime()+i*86400000);
-      g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${String(dia.getDate()).padStart(2,'0')}</text>`;
-    }
-    document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gasto acumulado comparado ao ritmo ideal">${g}</svg>`;
-  })();
-
-  /* tabela */
-  (function(){
-    const el=document.getElementById('tabela');
-    if(!TODOS.length){ el.innerHTML='<div class="empty">Nenhum gasto lançado ainda.</div>'; return; }
-    const porData={};
-    TODOS.forEach(l=>{(porData[l.data]=porData[l.data]||[]).push(l)});
-    let hh='<div class="card" style="padding:6px 4px"><table><thead><tr><th>Descrição</th><th class="num">Valor</th></tr></thead><tbody>';
-    Object.keys(porData).sort().reverse().forEach(dt=>{
-      const tot=porData[dt].reduce((s,l)=>s+l.valor,0);
-      hh+=`<tr class="day"><td>${d(dt).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</td><td class="num">${brl(tot)}</td></tr>`;
-      porData[dt].forEach(l=>{
-        const li = l.local ? locais().findIndex(z=>z.data===l.data&&z.desc===l.desc&&z.valor===l.valor&&z.quem===l.quem) : -1;
-        hh+=`<tr><td>${l.desc}<span class="who">${l.quem}</span>${l.local?'<span class="tag-local">neste aparelho</span>':''}</td>`+
-            `<td class="num">${brl(l.valor)}${li>=0?` <button class="del" data-i="${li}" title="remover">×</button>`:''}</td></tr>`;
-      });
-    });
-    el.innerHTML=hh+'</tbody></table></div>';
-    el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
-      const a=locais(); a.splice(+b.dataset.i,1); salvarLocais(a); render();
-    });
-  })();
+  desenharGrafico({TODOS,iHoje,planoAcum,cor,gasto});
+  desenharTabela(TODOS);
 
   document.getElementById('foot').innerHTML =
     `Ciclo do cartão fecha dia 26 de cada mês · orçamento de ${brl(ORCAMENTO)}.<br>`+
     `Dados oficiais atualizados em ${ATUALIZADO} pelo Claude.<br>`+
     `A senha desta página só evita curiosos — não é criptografia. Não guarde nada sigiloso aqui.`;
+}
+
+/* ---------- gráfico ---------- */
+function desenharGrafico({TODOS,iHoje,planoAcum,cor,gasto}){
+  const W=760,H=240,ML=60,MR=16,MT=16,MB=34, iw=W-ML-MR, ih=H-MT-MB;
+  const n=DIAS.length;
+  const x=i=> ML+(n<=1?iw/2:i/(n-1)*iw);
+  const maxY=Math.max(ORCAMENTO,gasto)*1.05;
+  const y=v=> MT+ih-(v/maxY)*ih;
+
+  const porDia = DIAS.map(s=>TODOS.filter(l=>l.data===s).reduce((a,b)=>a+b.valor,0));
+  const real=[]; let s=0;
+  for(let i=0;i<=iHoje;i++){ s+=porDia[i]; real.push(s); }
+
+  let g='';
+  /* faixas de fim de semana (recessivas, atrás de tudo) */
+  DIAS.forEach((dt,i)=>{ if(!ehFds(dt)) return;
+    const meio=(n<=1?iw:iw/(n-1)), x0=x(i)-meio/2, w=meio;
+    g+=`<rect x="${Math.max(x0,ML)}" y="${MT}" width="${Math.min(w,W-MR-Math.max(x0,ML))}" height="${ih}" fill="var(--band)"/>`;
+  });
+  /* grade */
+  [0,.25,.5,.75,1].forEach(f=>{ const v=maxY*f;
+    g+=`<line x1="${ML}" y1="${y(v)}" x2="${W-MR}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`+
+       `<text x="${ML-9}" y="${y(v)+4}" text-anchor="end" font-size="10.5" fill="var(--muted)">${(v/1000).toFixed(1).replace('.',',')}k</text>`;});
+  /* linha do plano (quebrada: sobe mais no fim de semana) */
+  g+=`<polyline points="${planoAcum.map((v,i)=>`${x(i)},${y(v)}`).join(' ')}" fill="none"
+        stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round" opacity=".85"/>`;
+  /* linha real */
+  if(real.length){
+    g+=`<polyline points="${real.map((v,i)=>`${x(i)},${y(v)}`).join(' ')}" fill="none"
+          stroke="${cor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    real.forEach((v,i)=>{ g+=`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="${cor}" stroke="var(--panel)" stroke-width="2"/>`; });
+  }
+  /* eixo x */
+  DIAS.forEach((dt,i)=>{
+    const dd=d(dt);
+    g+=`<text x="${x(i)}" y="${H-16}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${String(dd.getDate()).padStart(2,'0')}</text>`+
+       `<text x="${x(i)}" y="${H-4}" text-anchor="middle" font-size="9" fill="var(--muted)" opacity=".8">${['dom','seg','ter','qua','qui','sex','sáb'][dd.getDay()]}</text>`;
+  });
+  /* crosshair + áreas de toque */
+  g+=`<line id="cross" x1="0" y1="${MT}" x2="0" y2="${MT+ih}" stroke="var(--muted)" stroke-width="1" opacity="0"/>`;
+  DIAS.forEach((dt,i)=>{ const meio=(n<=1?iw:iw/(n-1));
+    g+=`<rect class="hit" data-i="${i}" x="${x(i)-meio/2}" y="${MT}" width="${meio}" height="${ih}" fill="transparent"/>`;});
+
+  document.getElementById('chart').innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gasto acumulado comparado ao plano, com sábado e domingo destacados">${g}</svg>`;
+
+  /* tooltip */
+  const svg=document.querySelector('#chart svg'), tip=document.getElementById('tip'),
+        cross=svg.querySelector('#cross'), wrap=document.getElementById('chartWrap');
+  const mostrar=i=>{
+    const dt=DIAS[i], fut=i>iHoje;
+    cross.setAttribute('x1',x(i)); cross.setAttribute('x2',x(i)); cross.setAttribute('opacity','.5');
+    tip.innerHTML =
+      `<b>${d(dt).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'})}</b>`+
+      `${ehFds(dt)?' · fim de semana':''}<br>`+
+      (fut ? `<span style="color:var(--muted)">ainda não chegou</span><br>`
+           : `gasto no dia: ${brl(porDia[i])}<br>acumulado: <b>${brl(real[i])}</b><br>`)+
+      `plano acumulado: ${brl(planoAcum[i])}`;
+    const r=svg.getBoundingClientRect(), px=(x(i)/W)*r.width;
+    tip.style.opacity='1';
+    tip.style.left=Math.min(Math.max(px-tip.offsetWidth/2,0),r.width-tip.offsetWidth)+'px';
+    tip.style.top=(y(Math.max(real[i]??0,planoAcum[i]))/H)*r.height-tip.offsetHeight-12+'px';
+  };
+  svg.querySelectorAll('.hit').forEach(el=>{
+    el.addEventListener('pointerenter',()=>mostrar(+el.dataset.i));
+    el.addEventListener('pointerdown',()=>mostrar(+el.dataset.i));
+  });
+  wrap.addEventListener('pointerleave',()=>{ tip.style.opacity='0'; cross.setAttribute('opacity','0'); });
+}
+
+/* ---------- tabela ---------- */
+function desenharTabela(TODOS){
+  const el=document.getElementById('tabela');
+  if(!TODOS.length){ el.innerHTML='<div class="empty">Nenhum gasto lançado ainda.</div>'; return; }
+  const porData={}; TODOS.forEach(l=>{(porData[l.data]=porData[l.data]||[]).push(l)});
+  let h='<div class="card" style="padding:6px 4px"><table><thead><tr><th>Descrição</th><th class="num">Valor</th></tr></thead><tbody>';
+  Object.keys(porData).sort().reverse().forEach(dt=>{
+    const tot=porData[dt].reduce((s,l)=>s+l.valor,0);
+    h+=`<tr class="day"><td>${d(dt).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}`+
+       `${ehFds(dt)?'<span class="fds">fim de semana</span>':''}</td>`+
+       `<td class="num">${brl(tot)} <span style="color:var(--muted);font-weight:400">/ ${brl(cota(dt))}</span></td></tr>`;
+    porData[dt].forEach(l=>{
+      const li = l.local ? locais().findIndex(z=>z.data===l.data&&z.desc===l.desc&&z.valor===l.valor&&z.quem===l.quem) : -1;
+      h+=`<tr><td>${l.desc}<span class="who">${l.quem}</span>${l.local?'<span class="tag-local">neste aparelho</span>':''}</td>`+
+         `<td class="num">${brl(l.valor)}${li>=0?` <button class="del" data-i="${li}" title="remover">×</button>`:''}</td></tr>`;
+    });
+  });
+  el.innerHTML=h+'</tbody></table></div>';
+  el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
+    const a=locais(); a.splice(+b.dataset.i,1); salvarLocais(a); render();
+  });
 }
 </script>
 </body>
