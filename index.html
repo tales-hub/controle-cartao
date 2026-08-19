@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0f1115">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Controle do Cartão</title>
 <style>
   :root{
@@ -90,6 +93,11 @@
   #gate button{width:100%}
   #gateErr{color:var(--bad);font-size:12px;height:16px;margin-top:8px}
   #app{display:none}
+  #novaVersao{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:80;
+       display:flex;align-items:center;gap:12px;background:var(--panel);color:var(--txt);
+       border:1px solid var(--line);border-radius:99px;padding:8px 8px 8px 18px;font-size:13px;
+       box-shadow:0 8px 28px rgba(0,0,0,.28)}
+  #novaVersao button{padding:8px 16px;border-radius:99px;font-size:13px}
 </style>
 </head>
 <body>
@@ -174,6 +182,7 @@ const INICIO      = "2026-08-19";
 const FIM         = "2026-08-26";
 const PESO_FDS    = 0.40;          // 40% do orçamento nos dias de fim de semana
 const ATUALIZADO  = "19/08/2026";
+const VERSAO      = "4";           // muda a cada publicação — o aviso de atualização compara este número
 const LANCAMENTOS = [
   { data:"2026-08-19", desc:"Lavagem do carro", quem:"Nicolle", valor:105.00 },
   { data:"2026-08-19", desc:"Barbeiro",         quem:"Tales",   valor:65.00 },
@@ -194,8 +203,8 @@ function tentar(){
 }
 document.getElementById('gateBtn').onclick=tentar;
 document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')tentar()});
-try{ if(localStorage.getItem(KEY_AUTH)==='1') abrir(); else document.getElementById('pw').focus(); }
-catch(e){ document.getElementById('pw').focus(); }
+/* a abertura automática fica no FIM do script — render() depende de constantes
+   declaradas mais abaixo (DIAS, etc.) e falharia silenciosamente se rodasse aqui. */
 
 /* ---------- utilidades ---------- */
 const brl = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -328,8 +337,44 @@ function render(){
 
   document.getElementById('foot').innerHTML =
     `Ciclo do cartão fecha dia 26 de cada mês · orçamento de ${brl(ORCAMENTO)}.<br>`+
-    `Dados oficiais atualizados em ${ATUALIZADO} pelo Claude.<br>`+
+    `Dados oficiais atualizados em ${ATUALIZADO} pelo Claude · versão ${VERSAO}.<br>`+
     `A senha desta página só evita curiosos — não é criptografia. Não guarde nada sigiloso aqui.`;
+}
+
+/* ---------- abertura automática de quem já digitou a senha antes ----------
+   Precisa ficar aqui no fim: render() usa DIAS/N_FDS/etc., declarados acima com const. */
+let jaEntrou=false;
+try{ jaEntrou = localStorage.getItem(KEY_AUTH)==='1'; }catch(e){ jaEntrou=false; }
+if(jaEntrou) abrir(); else document.getElementById('pw').focus();
+
+/* ---------- aviso de versão nova (contorna cache do navegador) ---------- */
+(function checarVersao(){
+  const url = location.pathname + '?cb=' + Date.now();
+  fetch(url,{cache:'no-store'})
+    .then(r=>r.ok?r.text():Promise.reject())
+    .then(t=>{
+      const m = t.match(/const VERSAO\s*=\s*"([^"]+)"/);
+      if(!m || m[1]===VERSAO) return;
+      const b=document.createElement('div');
+      b.id='novaVersao';
+      b.innerHTML=`<span>Versão nova disponível (${m[1]})</span><button>Atualizar</button>`;
+      b.querySelector('button').onclick=()=>location.replace(location.pathname+'?v='+Date.now());
+      document.body.appendChild(b);
+    })
+    .catch(()=>{});
+})();
+setInterval(()=>{ if(document.getElementById('app').style.display==='block' && !document.getElementById('novaVersao')) checarVersaoSilencioso(); }, 300000);
+function checarVersaoSilencioso(){
+  fetch(location.pathname+'?cb='+Date.now(),{cache:'no-store'})
+    .then(r=>r.ok?r.text():Promise.reject())
+    .then(t=>{ const m=t.match(/const VERSAO\s*=\s*"([^"]+)"/);
+      if(m && m[1]!==VERSAO && !document.getElementById('novaVersao')){
+        const b=document.createElement('div'); b.id='novaVersao';
+        b.innerHTML=`<span>Versão nova disponível (${m[1]})</span><button>Atualizar</button>`;
+        b.querySelector('button').onclick=()=>location.replace(location.pathname+'?v='+Date.now());
+        document.body.appendChild(b);
+      }})
+    .catch(()=>{});
 }
 
 /* ---------- gráfico ---------- */
