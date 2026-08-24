@@ -225,7 +225,7 @@
   <div class="card">
     <div class="chartlegend">
       <span><i class="swatch" style="background:var(--accent);height:10px;width:10px;border-radius:3px"></i> total do mês</span>
-      <span><i class="swatch" style="background:var(--muted);opacity:.8"></i> renda prevista (R$ 69,7 mil)</span>
+      <span><i class="swatch" style="background:var(--muted);opacity:.8"></i> <span id="gerLegRenda">renda prevista</span></span>
     </div>
     <div id="gerChart"></div>
   </div>
@@ -240,7 +240,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "24/08/2026";
-const VERSAO     = "15";     // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "16";     // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -249,11 +249,12 @@ const MESES = [
   { id:"2026-10", label:"Out/26", renda:69700 },
   { id:"2026-11", label:"Nov/26", renda:69700 },
   { id:"2026-12", label:"Dez/26", renda:69700 },
-  { id:"2027-01", label:"Jan/27", renda:79700 },   // +R$ 10 mil de renda extra em janeiro
-  { id:"2027-02", label:"Fev/27", renda:69700 },
-  { id:"2027-03", label:"Mar/27", renda:69700 },
-  { id:"2027-04", label:"Abr/27", renda:69700 },
-  { id:"2027-05", label:"Mai/27", renda:69700 },
+  /* +R$ 10 mil de renda a partir de jan/27 — aumento permanente, não pontual */
+  { id:"2027-01", label:"Jan/27", renda:79700 },
+  { id:"2027-02", label:"Fev/27", renda:79700 },
+  { id:"2027-03", label:"Mar/27", renda:79700 },
+  { id:"2027-04", label:"Abr/27", renda:79700 },
+  { id:"2027-05", label:"Mai/27", renda:79700 },
 ];
 const CONTAS_DEF = [
   { id:"aluguel-apto",  nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           venc:null, resp:"Casa" },
@@ -782,8 +783,13 @@ function renderGeral(){
   document.getElementById('sub').textContent =
     `Visão geral · ${MESES[0].label} a ${MESES[MESES.length-1].label} · fonte: planilha "projeção mensal"`;
   document.getElementById('regras').innerHTML =
-    `<span class="rule">renda prevista ${brl(69700)}/mês (Jan/27: ${brl(MESES.find(m=>m.id==='2027-01').renda)})</span>`+
+    `<span class="rule">renda ${brl(MESES[0].renda)}/mês · ${brl(MESES[MESES.length-1].renda)} a partir de Jan/27</span>`+
     `<span class="rule">contas caem ${brl(primeiro-ultimo)} até ${MESES[MESES.length-1].label}</span>`;
+
+  const rendas=[...new Set(MESES.map(m=>m.renda))];
+  document.getElementById('gerLegRenda').textContent = rendas.length>1
+    ? `renda prevista (${rendas.map(v=>(v/1000).toFixed(1).replace('.',',')+' mil').join(' → ')})`
+    : `renda prevista (${(rendas[0]/1000).toFixed(1).replace('.',',')} mil)`;
 
   document.getElementById('gerCards').innerHTML = `
     <div class="card"><div class="lbl">Maior mês</div><div class="val">${brl(totais[maiorI])}</div>
