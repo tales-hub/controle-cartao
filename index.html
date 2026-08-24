@@ -240,7 +240,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "24/08/2026";
-const VERSAO     = "14";     // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "15";     // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -249,7 +249,7 @@ const MESES = [
   { id:"2026-10", label:"Out/26", renda:69700 },
   { id:"2026-11", label:"Nov/26", renda:69700 },
   { id:"2026-12", label:"Dez/26", renda:69700 },
-  { id:"2027-01", label:"Jan/27", renda:69700 },
+  { id:"2027-01", label:"Jan/27", renda:79700 },   // +R$ 10 mil de renda extra em janeiro
   { id:"2027-02", label:"Fev/27", renda:69700 },
   { id:"2027-03", label:"Mar/27", renda:69700 },
   { id:"2027-04", label:"Abr/27", renda:69700 },
@@ -782,20 +782,20 @@ function renderGeral(){
   document.getElementById('sub').textContent =
     `Visão geral · ${MESES[0].label} a ${MESES[MESES.length-1].label} · fonte: planilha "projeção mensal"`;
   document.getElementById('regras').innerHTML =
-    `<span class="rule">renda prevista ${brl(69700)}/mês</span>`+
+    `<span class="rule">renda prevista ${brl(69700)}/mês (Jan/27: ${brl(MESES.find(m=>m.id==='2027-01').renda)})</span>`+
     `<span class="rule">contas caem ${brl(primeiro-ultimo)} até ${MESES[MESES.length-1].label}</span>`;
 
   document.getElementById('gerCards').innerHTML = `
     <div class="card"><div class="lbl">Maior mês</div><div class="val">${brl(totais[maiorI])}</div>
-      <div class="note">${MESES[maiorI].label} — sobra de ${brl(69700-totais[maiorI])}</div></div>
+      <div class="note">${MESES[maiorI].label} — sobra de ${brl(MESES[maiorI].renda-totais[maiorI])}</div></div>
     <div class="card"><div class="lbl">Menor mês</div><div class="val">${brl(totais[menorI])}</div>
-      <div class="note">${MESES[menorI].label} — sobra de ${brl(69700-totais[menorI])}</div></div>
+      <div class="note">${MESES[menorI].label} — sobra de ${brl(MESES[menorI].renda-totais[menorI])}</div></div>
     <div class="card"><div class="lbl">Queda no período</div><div class="val" style="color:var(--ok)">−${(100*(primeiro-ultimo)/primeiro).toFixed(0)}%</div>
       <div class="note">principalmente as parcelas dos cartões acabando</div></div>`;
 
-  /* gráfico de barras: total por mês + linha da renda */
+  /* gráfico de barras: total por mês + linha da renda (em degrau, por mês) */
   const W=760,H=250,ML=60,MR=16,MT=18,MB=26, iw=W-ML-MR, ih=H-MT-MB;
-  const maxY=Math.max(69700,...totais)*1.12;
+  const maxY=Math.max(...MESES.map(m=>m.renda),...totais)*1.12;
   const y=v=>MT+ih-(v/maxY)*ih;
   const bw=iw/MESES.length*0.62;
   const xc=i=>ML+iw*(i+0.5)/MESES.length;
@@ -803,8 +803,13 @@ function renderGeral(){
   [0,.25,.5,.75,1].forEach(f=>{ const v=maxY*f;
     g+=`<line x1="${ML}" y1="${y(v)}" x2="${W-MR}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`+
        `<text x="${ML-9}" y="${y(v)+4}" text-anchor="end" font-size="10.5" fill="var(--muted)">${Math.round(v/1000)}k</text>`;});
-  g+=`<line x1="${ML}" y1="${y(69700)}" x2="${W-MR}" y2="${y(69700)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".85"/>`+
-     `<text x="${W-MR}" y="${y(69700)-6}" text-anchor="end" font-size="10" fill="var(--muted)">renda</text>`;
+  const stepW=iw/MESES.length;
+  MESES.forEach((m,i)=>{
+    g+=`<line x1="${ML+i*stepW}" y1="${y(m.renda)}" x2="${ML+(i+1)*stepW}" y2="${y(m.renda)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".85"/>`;
+    if(i>0&&MESES[i-1].renda!==m.renda)
+      g+=`<line x1="${ML+i*stepW}" y1="${y(MESES[i-1].renda)}" x2="${ML+i*stepW}" y2="${y(m.renda)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".85"/>`;
+  });
+  g+=`<text x="${W-MR}" y="${y(MESES[MESES.length-1].renda)-6}" text-anchor="end" font-size="10" fill="var(--muted)">renda</text>`;
   totais.forEach((v,i)=>{
     const atual=MESES[i].id===mesVigente();
     g+=`<rect x="${xc(i)-bw/2}" y="${y(v)}" width="${bw}" height="${MT+ih-y(v)}" rx="4"
