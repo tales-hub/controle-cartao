@@ -25,10 +25,37 @@
        -webkit-font-smoothing:antialiased;padding:24px 16px 56px}
   .wrap{max-width:860px;margin:0 auto}
   h1{font-size:20px;margin:0 0 12px;font-weight:650;letter-spacing:-.01em}
-  .tabs{display:flex;gap:8px;margin-bottom:14px}
+  .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
   .tab{font:inherit;font-size:14px;font-weight:600;padding:9px 20px;border-radius:99px;cursor:pointer;
        background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
   .tab.on{background:var(--accent);color:#fff;border-color:transparent}
+  .tabsep{width:1px;height:24px;background:var(--line);margin:0 4px}
+  .tabgrp{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-right:2px}
+  /* contas do mês */
+  .conta{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+  .conta.paga{border-color:color-mix(in srgb, var(--ok) 45%, var(--line))}
+  .conta .topo{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .conta .nome{font-weight:650;font-size:15px;line-height:1.35}
+  .conta .meta{font-size:12px;color:var(--muted);margin-top:3px}
+  .conta .valor{font-size:19px;font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .pagobtn{font-size:12px;font-weight:600;padding:7px 14px;border-radius:99px;cursor:pointer;
+       border:1px solid var(--line);background:var(--panel2);color:var(--muted)}
+  .pagobtn.on{background:var(--ok);color:#fff;border-color:transparent}
+  .anexos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  @media(max-width:640px){ .anexos{grid-template-columns:1fr} }
+  .anexo{background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:11px 12px;font-size:12px}
+  .anexo.tem{border-style:solid}
+  .anexo .albl{text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  .anexo .acode{font-family:ui-monospace,Menlo,monospace;font-size:11px;word-break:break-all;
+       max-height:52px;overflow:hidden;color:var(--txt);margin-bottom:8px}
+  .anexo img{max-width:100%;max-height:120px;border-radius:8px;display:block;margin-bottom:8px}
+  .anexo .arow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .mini{font-size:11px;padding:6px 11px;border-radius:99px;font-weight:600;cursor:pointer;
+       background:var(--accent);color:#fff;border:none}
+  .mini.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+  .anexo input[type=file]{display:none}
+  .grpchip{font-size:11px;color:var(--muted);background:var(--panel2);padding:2px 8px;border-radius:99px}
+  .respchip{font-size:11px;color:var(--accent);border:1px solid var(--line);padding:2px 8px;border-radius:99px}
   .sub{color:var(--muted);font-size:13px;margin-bottom:6px}
   .rule{display:inline-block;font-size:12px;color:var(--muted);background:var(--panel2);
         border:1px solid var(--line);border-radius:99px;padding:5px 12px;margin:0 6px 8px 0}
@@ -132,6 +159,7 @@
 <div class="sub" id="sub"></div>
 <div id="regras"></div>
 
+<div id="viewCartao">
 <div class="grid" id="cards"></div>
 
 <h2>Lançar gasto</h2>
@@ -165,6 +193,19 @@
 
 <h2>Lançamentos <button class="btn-ghost" id="copiar">copiar para o chat</button></h2>
 <div id="tabela"></div>
+</div><!-- /viewCartao -->
+
+<div id="viewPag" style="display:none">
+  <div class="grid" id="pagResumo"></div>
+  <h2>Contas do mês <button class="btn-ghost" id="pagCopiar">copiar situação para o chat</button></h2>
+  <div id="pagLista"></div>
+  <div class="note" style="margin-top:14px;color:var(--muted);font-size:12px;line-height:1.6">
+    Anexos feitos <b>neste aparelho</b> (boleto, pix ou comprovante) ficam salvos só neste navegador.
+    Para virarem oficiais e aparecerem no celular dos dois, mande o arquivo ou o código na conversa
+    com o Claude — ele embute na página. Fotos são reduzidas antes de salvar; arquivos muito grandes
+    devem ir direto pelo chat.
+  </div>
+</div>
 
 <div class="foot" id="foot"></div>
 
@@ -173,7 +214,34 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "24/08/2026";
-const VERSAO     = "12";     // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "13";     // muda a cada publicação — o aviso de atualização compara este número
+
+/* Contas do mês (aba Contas · Setembro) — fonte: planilha "projecao mensal", coluna set./26.
+   `cobranca` = a conta a pagar (pix copia-e-cola, linha digitável ou arquivo embutido) — o Tales
+   manda pelo chat e o Claude embute aqui. `comprovante` = evidência oficial de pagamento. */
+const PAGAMENTOS = [
+  { id:"aluguel-apto",  nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           valor:19700.00, venc:null, resp:"Casa" },
+  { id:"cartao-itau",   nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           valor:17522.00, venc:null, resp:"Casa" },
+  { id:"cartao-nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           valor:7240.00,  venc:null, resp:"Casa" },
+  { id:"escola-miguel", nome:"Escola do Miguel",                     grupo:"Educação",          valor:5957.00,  venc:null, resp:"Casa" },
+  { id:"sala-nicolle",  nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", valor:4000.00, venc:null, resp:"Nicolle" },
+  { id:"financ-carro",  nome:"Financiamento do carro",               grupo:"Transporte",        valor:2877.00,  venc:null, resp:"Casa" },
+  { id:"consorcio-400", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      valor:2574.39,  venc:null, resp:"Casa" },
+  { id:"diarista",      nome:"Diarista",                             grupo:"Serviços do Lar",   valor:2430.00,  venc:null, resp:"Casa" },
+  { id:"pix-geral",     nome:"Pix Geral",                            grupo:"Variáveis",         valor:1500.00,  venc:null, resp:"Casa" },
+  { id:"cartao-rico",   nome:"Cartão Rico",                          grupo:"Cartões",           valor:1084.00,  venc:null, resp:"Casa" },
+  { id:"personal",      nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", valor:900.00,   venc:null, resp:"Casa" },
+  { id:"pos-nicolle",   nome:"Pós-graduação da Nicolle",             grupo:"Educação",          valor:848.00,   venc:null, resp:"Nicolle" },
+  { id:"consorcio-50",  nome:"Consórcio do carro (R$ 50 mil)",       grupo:"Investimento",      valor:711.50,   venc:null, resp:"Casa" },
+  { id:"cartao-santa",  nome:"Cartão Santander",                     grupo:"Cartões",           valor:649.00,   venc:null, resp:"Casa" },
+  { id:"luz",           nome:"Luz",                                  grupo:"Serviços do Lar",   valor:300.00,   venc:null, resp:"Casa" },
+  { id:"cartao-porto",  nome:"Cartão Porto Seguro",                  grupo:"Cartões",           valor:200.00,   venc:null, resp:"Casa" },
+  { id:"internet",      nome:"Internet",                             grupo:"Serviços do Lar",   valor:166.00,   venc:null, resp:"Casa" },
+];
+/* cobranças e comprovantes oficiais embutidos pelo Claude (por id):
+   OFICIAL[id] = { cobranca:{tipo:"pix"|"barras"|"arquivo", texto?, dataUri?, nomeArq?},
+                   comprovante:{...mesma forma}, pago:true|false } */
+const OFICIAL = {};
 
 const CICLOS = [
   {
@@ -281,7 +349,20 @@ document.getElementById('copiar').onclick=()=>{
 };
 
 /* ---------- render ---------- */
+function renderTabs(){
+  document.getElementById('tabs').innerHTML =
+    `<span class="tabgrp">Cartão</span>`+
+    CICLOS.map(x=>`<button class="tab${x.id===ativo?' on':''}" data-t="${x.id}">${x.label}</button>`).join('')+
+    `<span class="tabsep"></span><span class="tabgrp">Contas</span>`+
+    `<button class="tab${ativo==='pag'?' on':''}" data-t="pag">Setembro</button>`;
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+}
 function render(){
+  renderTabs();
+  const ehPag = ativo==='pag';
+  document.getElementById('viewCartao').style.display = ehPag?'none':'block';
+  document.getElementById('viewPag').style.display    = ehPag?'block':'none';
+  if(ehPag){ renderPagamentos(); return; }
   const c = CICLOS.find(x=>x.id===ativo) || CICLOS[0];
   const {DIAS,qUtil,qFds,frac} = cotas(c);
   const n=DIAS.length, HOJE=hojeISO();
@@ -294,11 +375,6 @@ function render(){
   const porDiaMap={}; TODOS.forEach(l=>{porDiaMap[l.data]=(porDiaMap[l.data]||0)+l.valor});
   const gasto=TODOS.reduce((s,l)=>s+l.valor,0), restante=c.orcamento-gasto;
   const gHoje=dentro?(porDiaMap[HOJE]||0):0;
-
-  /* abas */
-  document.getElementById('tabs').innerHTML = CICLOS.map(x=>
-    `<button class="tab${x.id===c.id?' on':''}" data-t="${x.id}">${x.label}</button>`).join('');
-  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 
   /* plano acumulado */
   let acc=0; const plano=DIAS.map(s=>acc+=c.orcamento*frac(s));
@@ -505,9 +581,165 @@ function desenharTabela(c,TODOS,frac){
     const a=locais(); a.splice(+b.dataset.i,1); salvarLocais(a); render(); });
 }
 
+/* ---------- contas do mês (aba Contas · Setembro) ---------- */
+const KEY_PAGL='cc_pag_v1';
+function pagLocais(){ try{ return JSON.parse(localStorage.getItem(KEY_PAGL)||'{}') }catch(e){ return {} } }
+function pagSalvar(o){ try{ localStorage.setItem(KEY_PAGL,JSON.stringify(o)) }catch(e){
+  alert('Não coube na memória deste navegador — mande esse arquivo pelo chat com o Claude que ele embute na página.'); } }
+function pagEstado(id){
+  const loc=pagLocais()[id]||{}, ofi=OFICIAL[id]||{};
+  return {
+    pago: (typeof loc.pago==='boolean')?loc.pago:!!ofi.pago,
+    pagoLocal: typeof loc.pago==='boolean',
+    cobranca: loc.cobranca?{...loc.cobranca,local:true}:(ofi.cobranca||null),
+    comprovante: loc.comprovante?{...loc.comprovante,local:true}:(ofi.comprovante||null)
+  };
+}
+
+function renderPagamentos(){
+  const total=PAGAMENTOS.reduce((s,p)=>s+p.valor,0);
+  const pagos=PAGAMENTOS.filter(p=>pagEstado(p.id).pago);
+  const vPago=pagos.reduce((s,p)=>s+p.valor,0);
+  const pct=total>0?vPago/total*100:0;
+
+  document.getElementById('sub').textContent =
+    `Contas de setembro · fonte: planilha "projeção mensal" (set./26) · ${PAGAMENTOS.length} contas`;
+  document.getElementById('regras').innerHTML =
+    `<span class="rule">Total do mês ${brl(total)}</span>`+
+    `<span class="rule">renda prevista R$ 69.700 · sobra projetada R$ 1.042</span>`;
+
+  document.getElementById('pagResumo').innerHTML = `
+  <div class="card big">
+    <div class="lbl">Pago até agora</div>
+    <div class="val">${brl(vPago)}</div>
+    <div class="barwrap"><div class="barfill"><div class="bar" style="width:${pct}%;background:var(--ok)"></div></div></div>
+    <div class="legend"><span>${pagos.length} de ${PAGAMENTOS.length} contas pagas (${pct.toFixed(0)}%)</span>
+      <span>falta ${brl(total-vPago)}</span></div>
+  </div>`;
+
+  const el=document.getElementById('pagLista');
+  el.innerHTML = PAGAMENTOS.map(p=>{
+    const st=pagEstado(p.id);
+    return `<div class="conta${st.pago?' paga':''}" data-id="${p.id}">
+      <div class="topo">
+        <div>
+          <div class="nome">${st.pago?'✅ ':''}${p.nome}</div>
+          <div class="meta"><span class="grpchip">${p.grupo}</span> <span class="respchip">${p.resp}</span>
+            ${p.venc?` · vence dia ${p.venc}`:' · vencimento não informado'}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="valor">${brl(p.valor)}</div>
+          <button class="pagobtn${st.pago?' on':''}" data-act="pago">${st.pago?'Paga ✓':'Marcar paga'}</button>
+          ${st.pagoLocal?'<div class="meta" style="margin-top:4px">status neste aparelho</div>':''}
+        </div>
+      </div>
+      <div class="anexos">
+        ${anexoHtml(p.id,'cobranca','Conta a pagar (boleto · pix · código de barras)',st.cobranca)}
+        ${anexoHtml(p.id,'comprovante','Comprovante de pagamento',st.comprovante)}
+      </div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.pagobtn').forEach(b=>b.onclick=()=>{
+    const id=b.closest('.conta').dataset.id, o=pagLocais();
+    o[id]=o[id]||{}; o[id].pago=!pagEstado(id).pago; pagSalvar(o); renderPagamentos();
+  });
+  el.querySelectorAll('[data-act="pix"]').forEach(b=>b.onclick=()=>{
+    const {id,campo}=b.dataset;
+    const t=prompt('Cole o pix copia-e-cola ou a linha digitável do boleto:');
+    if(!t||!t.trim()) return;
+    const o=pagLocais(); o[id]=o[id]||{};
+    o[id][campo]={tipo:/^\d[\d .]{30,}$/.test(t.trim())?'barras':'pix',texto:t.trim()};
+    pagSalvar(o); renderPagamentos();
+  });
+  el.querySelectorAll('[data-act="arquivo"]').forEach(b=>b.onclick=()=>{
+    b.closest('.anexo').querySelector('input[type=file]').click();
+  });
+  el.querySelectorAll('.anexo input[type=file]').forEach(inp=>inp.onchange=async()=>{
+    const f=inp.files[0]; if(!f) return;
+    const {id,campo}=inp.dataset;
+    let dataUri;
+    if(f.type.startsWith('image/')) dataUri=await encolherImagem(f);
+    else if(f.size<=1500000) dataUri=await lerArquivo(f);
+    else { alert('Arquivo grande demais para guardar neste aparelho — mande pelo chat com o Claude que ele embute na página.'); inp.value=''; return; }
+    const o=pagLocais(); o[id]=o[id]||{};
+    o[id][campo]={tipo:'arquivo',dataUri,nomeArq:f.name,mime:f.type};
+    pagSalvar(o); renderPagamentos();
+  });
+  el.querySelectorAll('[data-act="copiartexto"]').forEach(b=>b.onclick=()=>{
+    const done=()=>{ b.textContent='copiado ✓'; setTimeout(()=>renderPagamentos(),900); };
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(b.dataset.txt).then(done,()=>prompt('Copie:',b.dataset.txt));
+    else prompt('Copie:',b.dataset.txt);
+  });
+  el.querySelectorAll('[data-act="remover"]').forEach(b=>b.onclick=()=>{
+    const {id,campo}=b.dataset, o=pagLocais();
+    if(o[id]){ delete o[id][campo]; pagSalvar(o); renderPagamentos(); }
+  });
+
+  document.getElementById('foot').innerHTML =
+    `Contas de setembro · dados oficiais atualizados em ${ATUALIZADO} pelo Claude · versão ${VERSAO}.<br>`+
+    `A senha desta página só evita curiosos — não é criptografia. Não guarde nada sigiloso aqui.`;
+}
+
+function anexoHtml(id,campo,rotulo,a){
+  let corpo='';
+  if(a){
+    if(a.tipo==='arquivo'){
+      corpo = (a.mime||'').startsWith('image/')
+        ? `<a href="${a.dataUri}" target="_blank"><img src="${a.dataUri}" alt="${a.nomeArq||'anexo'}"></a>`
+        : `<div class="acode">📎 ${a.nomeArq||'arquivo'}</div>`;
+      corpo += `<div class="arow"><a class="mini" style="text-decoration:none" href="${a.dataUri}" download="${a.nomeArq||campo}">abrir/baixar</a>`;
+    } else {
+      corpo = `<div class="acode">${a.texto}</div>`+
+              `<div class="arow"><button class="mini" data-act="copiartexto" data-txt="${a.texto.replace(/"/g,'&quot;')}">copiar ${a.tipo==='pix'?'pix':'código'}</button>`;
+    }
+    corpo += a.local
+      ? ` <span class="tag-local">neste aparelho</span> <button class="mini ghost" data-act="remover" data-id="${id}" data-campo="${campo}">remover</button></div>`
+      : ` <span class="grpchip">oficial</span></div>`;
+  } else {
+    corpo = `<div class="arow">
+      <button class="mini ghost" data-act="arquivo">anexar arquivo/foto</button>
+      <button class="mini ghost" data-act="pix" data-id="${id}" data-campo="${campo}">colar pix/código</button>
+    </div>`;
+  }
+  return `<div class="anexo${a?' tem':''}">
+    <div class="albl">${rotulo}</div>${corpo}
+    <input type="file" accept="image/*,.pdf" data-id="${id}" data-campo="${campo}">
+  </div>`;
+}
+function lerArquivo(f){ return new Promise((res,rej)=>{
+  const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); }); }
+async function encolherImagem(f){
+  const url=await lerArquivo(f);
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const esc=Math.min(1,1200/Math.max(img.width,img.height));
+      const cv=document.createElement('canvas');
+      cv.width=Math.round(img.width*esc); cv.height=Math.round(img.height*esc);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      res(cv.toDataURL('image/jpeg',0.8));
+    };
+    img.onerror=()=>res(url);
+    img.src=url;
+  });
+}
+document.getElementById('pagCopiar').onclick=()=>{
+  const linhas=PAGAMENTOS.map(p=>{
+    const st=pagEstado(p.id);
+    const flags=[st.pago?'PAGA':'pendente',
+      st.cobranca?(st.cobranca.local?'cobrança neste aparelho':'cobrança ok'):'sem cobrança',
+      st.comprovante?(st.comprovante.local?'comprovante neste aparelho':'comprovante ok'):'sem comprovante'];
+    return `${p.nome} — ${brl(p.valor)} — ${flags.join(' · ')}`;
+  }).join('\n');
+  const done=()=>alert('Copiado! Cole na conversa com o Claude para oficializar os status.');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(linhas).then(done,()=>prompt('Copie:',linhas));
+  else prompt('Copie:',linhas);
+};
+
 /* ---------- abertura automática (fica no fim: render() usa o que está acima) ---------- */
 try{ ativo = localStorage.getItem(KEY_TAB) || cicloVigente(); }catch(e){ ativo = cicloVigente(); }
-if(!CICLOS.some(x=>x.id===ativo)) ativo=cicloVigente();
+if(ativo!=='pag' && !CICLOS.some(x=>x.id===ativo)) ativo=cicloVigente();
 let jaEntrou=false;
 try{ jaEntrou = localStorage.getItem(KEY_AUTH)==='1'; }catch(e){ jaEntrou=false; }
 if(jaEntrou) abrir(); else document.getElementById('pw').focus();
