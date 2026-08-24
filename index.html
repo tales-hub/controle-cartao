@@ -56,6 +56,17 @@
   .anexo input[type=file]{display:none}
   .grpchip{font-size:11px;color:var(--muted);background:var(--panel2);padding:2px 8px;border-radius:99px}
   .respchip{font-size:11px;color:var(--accent);border:1px solid var(--line);padding:2px 8px;border-radius:99px}
+  .mchip{font:inherit;font-size:12px;font-weight:600;padding:7px 13px;border-radius:99px;cursor:pointer;
+       background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+  .mchip.on{background:var(--txt);color:var(--bg);border-color:transparent}
+  .gt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+  .gt th{position:sticky;left:auto;text-align:right;padding:6px 8px;font-size:10.5px}
+  .gt th:first-child,.gt td:first-child{text-align:left;max-width:190px;overflow:hidden;
+       text-overflow:ellipsis;white-space:nowrap}
+  .gt td{padding:7px 8px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;border-bottom:1px solid var(--line)}
+  .gt tr:last-child td{border-bottom:none}
+  .gt .tot td{background:var(--panel2);font-weight:650}
+  .gt .up{color:var(--bad)} .gt .dn{color:var(--ok)}
   .sub{color:var(--muted);font-size:13px;margin-bottom:6px}
   .rule{display:inline-block;font-size:12px;color:var(--muted);background:var(--panel2);
         border:1px solid var(--line);border-radius:99px;padding:5px 12px;margin:0 6px 8px 0}
@@ -196,6 +207,7 @@
 </div><!-- /viewCartao -->
 
 <div id="viewPag" style="display:none">
+  <div class="tabs" id="mchips" style="margin-bottom:6px"></div>
   <div class="grid" id="pagResumo"></div>
   <h2>Contas do mês <button class="btn-ghost" id="pagCopiar">copiar situação para o chat</button></h2>
   <div id="pagLista"></div>
@@ -207,6 +219,20 @@
   </div>
 </div>
 
+<div id="viewGer" style="display:none">
+  <div class="grid" id="gerCards"></div>
+  <h2>Total das contas, mês a mês</h2>
+  <div class="card">
+    <div class="chartlegend">
+      <span><i class="swatch" style="background:var(--accent);height:10px;width:10px;border-radius:3px"></i> total do mês</span>
+      <span><i class="swatch" style="background:var(--muted);opacity:.8"></i> renda prevista (R$ 69,7 mil)</span>
+    </div>
+    <div id="gerChart"></div>
+  </div>
+  <h2>Cada conta, mês a mês</h2>
+  <div class="card" style="padding:6px 4px;overflow-x:auto"><div id="gerTabela"></div></div>
+</div>
+
 <div class="foot" id="foot"></div>
 
 </div></div>
@@ -214,33 +240,63 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "24/08/2026";
-const VERSAO     = "13";     // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "14";     // muda a cada publicação — o aviso de atualização compara este número
 
-/* Contas do mês (aba Contas · Setembro) — fonte: planilha "projecao mensal", coluna set./26.
-   `cobranca` = a conta a pagar (pix copia-e-cola, linha digitável ou arquivo embutido) — o Tales
-   manda pelo chat e o Claude embute aqui. `comprovante` = evidência oficial de pagamento. */
-const PAGAMENTOS = [
-  { id:"aluguel-apto",  nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           valor:19700.00, venc:null, resp:"Casa" },
-  { id:"cartao-itau",   nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           valor:17522.00, venc:null, resp:"Casa" },
-  { id:"cartao-nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           valor:7240.00,  venc:null, resp:"Casa" },
-  { id:"escola-miguel", nome:"Escola do Miguel",                     grupo:"Educação",          valor:5957.00,  venc:null, resp:"Casa" },
-  { id:"sala-nicolle",  nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", valor:4000.00, venc:null, resp:"Nicolle" },
-  { id:"financ-carro",  nome:"Financiamento do carro",               grupo:"Transporte",        valor:2877.00,  venc:null, resp:"Casa" },
-  { id:"consorcio-400", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      valor:2574.39,  venc:null, resp:"Casa" },
-  { id:"diarista",      nome:"Diarista",                             grupo:"Serviços do Lar",   valor:2430.00,  venc:null, resp:"Casa" },
-  { id:"pix-geral",     nome:"Pix Geral",                            grupo:"Variáveis",         valor:1500.00,  venc:null, resp:"Casa" },
-  { id:"cartao-rico",   nome:"Cartão Rico",                          grupo:"Cartões",           valor:1084.00,  venc:null, resp:"Casa" },
-  { id:"personal",      nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", valor:900.00,   venc:null, resp:"Casa" },
-  { id:"pos-nicolle",   nome:"Pós-graduação da Nicolle",             grupo:"Educação",          valor:848.00,   venc:null, resp:"Nicolle" },
-  { id:"consorcio-50",  nome:"Consórcio do carro (R$ 50 mil)",       grupo:"Investimento",      valor:711.50,   venc:null, resp:"Casa" },
-  { id:"cartao-santa",  nome:"Cartão Santander",                     grupo:"Cartões",           valor:649.00,   venc:null, resp:"Casa" },
-  { id:"luz",           nome:"Luz",                                  grupo:"Serviços do Lar",   valor:300.00,   venc:null, resp:"Casa" },
-  { id:"cartao-porto",  nome:"Cartão Porto Seguro",                  grupo:"Cartões",           valor:200.00,   venc:null, resp:"Casa" },
-  { id:"internet",      nome:"Internet",                             grupo:"Serviços do Lar",   valor:166.00,   venc:null, resp:"Casa" },
+/* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
+   Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
+const MESES = [
+  { id:"2026-09", label:"Set/26", renda:69700 },
+  { id:"2026-10", label:"Out/26", renda:69700 },
+  { id:"2026-11", label:"Nov/26", renda:69700 },
+  { id:"2026-12", label:"Dez/26", renda:69700 },
+  { id:"2027-01", label:"Jan/27", renda:69700 },
+  { id:"2027-02", label:"Fev/27", renda:69700 },
+  { id:"2027-03", label:"Mar/27", renda:69700 },
+  { id:"2027-04", label:"Abr/27", renda:69700 },
+  { id:"2027-05", label:"Mai/27", renda:69700 },
 ];
-/* cobranças e comprovantes oficiais embutidos pelo Claude (por id):
-   OFICIAL[id] = { cobranca:{tipo:"pix"|"barras"|"arquivo", texto?, dataUri?, nomeArq?},
-                   comprovante:{...mesma forma}, pago:true|false } */
+const CONTAS_DEF = [
+  { id:"aluguel-apto",  nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           venc:null, resp:"Casa" },
+  { id:"cartao-itau",   nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           venc:null, resp:"Casa" },
+  { id:"cartao-nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           venc:null, resp:"Casa" },
+  { id:"escola-miguel", nome:"Escola do Miguel",                     grupo:"Educação",          venc:null, resp:"Casa" },
+  { id:"sala-nicolle",  nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", venc:null, resp:"Nicolle" },
+  { id:"financ-carro",  nome:"Financiamento do carro",               grupo:"Transporte",        venc:null, resp:"Casa" },
+  { id:"consorcio-400", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      venc:null, resp:"Casa" },
+  { id:"diarista",      nome:"Diarista",                             grupo:"Serviços do Lar",   venc:null, resp:"Casa" },
+  { id:"pix-geral",     nome:"Pix Geral",                            grupo:"Variáveis",         venc:null, resp:"Casa" },
+  { id:"cartao-rico",   nome:"Cartão Rico",                          grupo:"Cartões",           venc:null, resp:"Casa" },
+  { id:"personal",      nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", venc:null, resp:"Casa" },
+  { id:"pos-nicolle",   nome:"Pós-graduação da Nicolle",             grupo:"Educação",          venc:null, resp:"Nicolle" },
+  { id:"consorcio-50",  nome:"Consórcio do carro (R$ 50 mil)",       grupo:"Investimento",      venc:null, resp:"Casa" },
+  { id:"cartao-santa",  nome:"Cartão Santander",                     grupo:"Cartões",           venc:null, resp:"Casa" },
+  { id:"luz",           nome:"Luz",                                  grupo:"Serviços do Lar",   venc:null, resp:"Casa" },
+  { id:"cartao-porto",  nome:"Cartão Porto Seguro",                  grupo:"Cartões",           venc:null, resp:"Casa" },
+  { id:"internet",      nome:"Internet",                             grupo:"Serviços do Lar",   venc:null, resp:"Casa" },
+];
+/* valores por conta, na ordem de MESES (set..mai). 0 = a conta não existe naquele mês. */
+const VALORES = {
+  "aluguel-apto":  [19700,19700,19700,19700,19700,19700,19700,19700,19700],
+  "cartao-itau":   [17522,5000,1545,960,858,282,224,35,35],
+  "cartao-nubank": [7240,7000,3678,3678,2378,2378,1715,1007,611],
+  "escola-miguel": [5957,5957,5957,5957,5957,5957,5957,5957,5957],
+  "sala-nicolle":  [4000,4000,4000,4000,3500,3500,3500,3500,3500],
+  "financ-carro":  [2877,2877,2877,2877,2877,2877,2877,2877,2877],
+  "consorcio-400": [2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39],
+  "diarista":      [2430,2430,2430,2430,2430,2430,2430,2430,2430],
+  "pix-geral":     [1500,1500,1500,1500,1500,1500,1500,0,0],
+  "cartao-rico":   [1084,89,89,45,45,45,45,45,45],
+  "personal":      [900,900,900,900,900,900,900,900,900],
+  "pos-nicolle":   [848,848,848,848,848,848,848,848,848],
+  "consorcio-50":  [711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50],
+  "cartao-santa":  [649,649,546,426,0,0,0,0,0],
+  "luz":           [300,300,300,300,300,300,300,300,300],
+  "cartao-porto":  [200,300,300,300,300,300,300,300,300],
+  "internet":      [166,166,166,166,166,166,166,166,166],
+};
+/* cobranças e comprovantes oficiais embutidos pelo Claude, por "mesId:contaId":
+   OFICIAL["2026-09:aluguel-apto"] = { cobranca:{tipo:"pix"|"barras"|"arquivo", texto?, dataUri?,
+   nomeArq?, mime?}, comprovante:{...}, pago:true|false } */
 const OFICIAL = {};
 
 const CICLOS = [
@@ -354,15 +410,17 @@ function renderTabs(){
     `<span class="tabgrp">Cartão</span>`+
     CICLOS.map(x=>`<button class="tab${x.id===ativo?' on':''}" data-t="${x.id}">${x.label}</button>`).join('')+
     `<span class="tabsep"></span><span class="tabgrp">Contas</span>`+
-    `<button class="tab${ativo==='pag'?' on':''}" data-t="pag">Setembro</button>`;
-  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+    `<button class="tab${ativo==='pag'?' on':''}" data-t="pag">Mensal</button>`+
+    `<button class="tab${ativo==='ger'?' on':''}" data-t="ger">Geral</button>`;
+  document.querySelectorAll('#tabs .tab').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 }
 function render(){
   renderTabs();
-  const ehPag = ativo==='pag';
-  document.getElementById('viewCartao').style.display = ehPag?'none':'block';
-  document.getElementById('viewPag').style.display    = ehPag?'block':'none';
-  if(ehPag){ renderPagamentos(); return; }
+  document.getElementById('viewCartao').style.display = (ativo==='pag'||ativo==='ger')?'none':'block';
+  document.getElementById('viewPag').style.display    = ativo==='pag'?'block':'none';
+  document.getElementById('viewGer').style.display    = ativo==='ger'?'block':'none';
+  if(ativo==='pag'){ renderPagamentos(); return; }
+  if(ativo==='ger'){ renderGeral(); return; }
   const c = CICLOS.find(x=>x.id===ativo) || CICLOS[0];
   const {DIAS,qUtil,qFds,frac} = cotas(c);
   const n=DIAS.length, HOJE=hojeISO();
@@ -581,13 +639,22 @@ function desenharTabela(c,TODOS,frac){
     const a=locais(); a.splice(+b.dataset.i,1); salvarLocais(a); render(); });
 }
 
-/* ---------- contas do mês (aba Contas · Setembro) ---------- */
-const KEY_PAGL='cc_pag_v1';
-function pagLocais(){ try{ return JSON.parse(localStorage.getItem(KEY_PAGL)||'{}') }catch(e){ return {} } }
+/* ---------- contas do mês ---------- */
+const KEY_PAGL='cc_pag_v1', KEY_MES='cc_mes_v1';
+function pagLocais(){
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY_PAGL)||'{}');
+    /* migração: chaves antigas sem "mes:" eram de setembro/26 */
+    let mudou=false;
+    for(const k of Object.keys(o)) if(!k.includes(':')){ o['2026-09:'+k]=o[k]; delete o[k]; mudou=true; }
+    if(mudou) localStorage.setItem(KEY_PAGL,JSON.stringify(o));
+    return o;
+  }catch(e){ return {} }
+}
 function pagSalvar(o){ try{ localStorage.setItem(KEY_PAGL,JSON.stringify(o)) }catch(e){
   alert('Não coube na memória deste navegador — mande esse arquivo pelo chat com o Claude que ele embute na página.'); } }
-function pagEstado(id){
-  const loc=pagLocais()[id]||{}, ofi=OFICIAL[id]||{};
+function pagEstado(chave){
+  const loc=pagLocais()[chave]||{}, ofi=OFICIAL[chave]||{};
   return {
     pago: (typeof loc.pago==='boolean')?loc.pago:!!ofi.pago,
     pagoLocal: typeof loc.pago==='boolean',
@@ -595,32 +662,57 @@ function pagEstado(id){
     comprovante: loc.comprovante?{...loc.comprovante,local:true}:(ofi.comprovante||null)
   };
 }
+function mesVigente(){
+  const t=hojeISO();
+  for(const m of MESES){
+    const [y,mm]=m.id.split('-').map(Number);
+    const ini=iso(new Date(y,mm-2,26)), fim=iso(new Date(y,mm-1,25));
+    if(t>=ini&&t<=fim) return m.id;
+  }
+  return t<'2026-08-26' ? MESES[0].id : MESES[MESES.length-1].id;
+}
+let mesSel=null;
+function contasDoMes(mid){
+  const i=MESES.findIndex(m=>m.id===mid);
+  return CONTAS_DEF.map(cdef=>({...cdef, valor:(VALORES[cdef.id]||[])[i]||0}))
+    .filter(p=>p.valor>0).sort((a,b)=>b.valor-a.valor);
+}
 
 function renderPagamentos(){
-  const total=PAGAMENTOS.reduce((s,p)=>s+p.valor,0);
-  const pagos=PAGAMENTOS.filter(p=>pagEstado(p.id).pago);
+  if(!mesSel){ try{ mesSel=localStorage.getItem(KEY_MES)||mesVigente(); }catch(e){ mesSel=mesVigente(); } }
+  if(!MESES.some(m=>m.id===mesSel)) mesSel=mesVigente();
+  const mes=MESES.find(m=>m.id===mesSel);
+  const lista=contasDoMes(mesSel);
+  const total=lista.reduce((s,p)=>s+p.valor,0);
+  const pagos=lista.filter(p=>pagEstado(mesSel+':'+p.id).pago);
   const vPago=pagos.reduce((s,p)=>s+p.valor,0);
   const pct=total>0?vPago/total*100:0;
 
+  document.getElementById('mchips').innerHTML = MESES.map(m=>
+    `<button class="mchip${m.id===mesSel?' on':''}" data-m="${m.id}">${m.label}</button>`).join('');
+  document.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{
+    mesSel=b.dataset.m; try{localStorage.setItem(KEY_MES,mesSel)}catch(e){} renderPagamentos(); });
+
+  const [my,mm]=mes.id.split('-').map(Number);
   document.getElementById('sub').textContent =
-    `Contas de setembro · fonte: planilha "projeção mensal" (set./26) · ${PAGAMENTOS.length} contas`;
+    `Contas de ${mes.label} · fatura ${fmtD(iso(new Date(my,mm-2,26)))} → ${fmtD(iso(new Date(my,mm-1,25)))} · ${lista.length} contas`;
   document.getElementById('regras').innerHTML =
     `<span class="rule">Total do mês ${brl(total)}</span>`+
-    `<span class="rule">renda prevista R$ 69.700 · sobra projetada R$ 1.042</span>`;
+    `<span class="rule">renda prevista ${brl(mes.renda)} · sobra projetada ${brl(mes.renda-total)}</span>`;
 
   document.getElementById('pagResumo').innerHTML = `
   <div class="card big">
-    <div class="lbl">Pago até agora</div>
+    <div class="lbl">Pago até agora — ${mes.label}</div>
     <div class="val">${brl(vPago)}</div>
     <div class="barwrap"><div class="barfill"><div class="bar" style="width:${pct}%;background:var(--ok)"></div></div></div>
-    <div class="legend"><span>${pagos.length} de ${PAGAMENTOS.length} contas pagas (${pct.toFixed(0)}%)</span>
+    <div class="legend"><span>${pagos.length} de ${lista.length} contas pagas (${pct.toFixed(0)}%)</span>
       <span>falta ${brl(total-vPago)}</span></div>
   </div>`;
 
   const el=document.getElementById('pagLista');
-  el.innerHTML = PAGAMENTOS.map(p=>{
-    const st=pagEstado(p.id);
-    return `<div class="conta${st.pago?' paga':''}" data-id="${p.id}">
+  el.innerHTML = lista.map(p=>{
+    const st=pagEstado(mesSel+':'+p.id);
+    return `<div class="conta${st.pago?' paga':''}" data-id="${mesSel}:${p.id}">
       <div class="topo">
         <div>
           <div class="nome">${st.pago?'✅ ':''}${p.nome}</div>
@@ -634,8 +726,8 @@ function renderPagamentos(){
         </div>
       </div>
       <div class="anexos">
-        ${anexoHtml(p.id,'cobranca','Conta a pagar (boleto · pix · código de barras)',st.cobranca)}
-        ${anexoHtml(p.id,'comprovante','Comprovante de pagamento',st.comprovante)}
+        ${anexoHtml(mesSel+':'+p.id,'cobranca','Conta a pagar (boleto · pix · código de barras)',st.cobranca)}
+        ${anexoHtml(mesSel+':'+p.id,'comprovante','Comprovante de pagamento',st.comprovante)}
       </div>
     </div>`;
   }).join('');
@@ -677,7 +769,69 @@ function renderPagamentos(){
   });
 
   document.getElementById('foot').innerHTML =
-    `Contas de setembro · dados oficiais atualizados em ${ATUALIZADO} pelo Claude · versão ${VERSAO}.<br>`+
+    `Contas de ${mes.label} · dados oficiais atualizados em ${ATUALIZADO} pelo Claude · versão ${VERSAO}.<br>`+
+    `A senha desta página só evita curiosos — não é criptografia. Não guarde nada sigiloso aqui.`;
+}
+
+/* ---------- visão geral (aba Contas · Geral) ---------- */
+function renderGeral(){
+  const totais=MESES.map((m,i)=>CONTAS_DEF.reduce((s,cdef)=>s+((VALORES[cdef.id]||[])[i]||0),0));
+  const primeiro=totais[0], ultimo=totais[totais.length-1];
+  const maiorI=totais.indexOf(Math.max(...totais)), menorI=totais.indexOf(Math.min(...totais));
+
+  document.getElementById('sub').textContent =
+    `Visão geral · ${MESES[0].label} a ${MESES[MESES.length-1].label} · fonte: planilha "projeção mensal"`;
+  document.getElementById('regras').innerHTML =
+    `<span class="rule">renda prevista ${brl(69700)}/mês</span>`+
+    `<span class="rule">contas caem ${brl(primeiro-ultimo)} até ${MESES[MESES.length-1].label}</span>`;
+
+  document.getElementById('gerCards').innerHTML = `
+    <div class="card"><div class="lbl">Maior mês</div><div class="val">${brl(totais[maiorI])}</div>
+      <div class="note">${MESES[maiorI].label} — sobra de ${brl(69700-totais[maiorI])}</div></div>
+    <div class="card"><div class="lbl">Menor mês</div><div class="val">${brl(totais[menorI])}</div>
+      <div class="note">${MESES[menorI].label} — sobra de ${brl(69700-totais[menorI])}</div></div>
+    <div class="card"><div class="lbl">Queda no período</div><div class="val" style="color:var(--ok)">−${(100*(primeiro-ultimo)/primeiro).toFixed(0)}%</div>
+      <div class="note">principalmente as parcelas dos cartões acabando</div></div>`;
+
+  /* gráfico de barras: total por mês + linha da renda */
+  const W=760,H=250,ML=60,MR=16,MT=18,MB=26, iw=W-ML-MR, ih=H-MT-MB;
+  const maxY=Math.max(69700,...totais)*1.12;
+  const y=v=>MT+ih-(v/maxY)*ih;
+  const bw=iw/MESES.length*0.62;
+  const xc=i=>ML+iw*(i+0.5)/MESES.length;
+  let g='';
+  [0,.25,.5,.75,1].forEach(f=>{ const v=maxY*f;
+    g+=`<line x1="${ML}" y1="${y(v)}" x2="${W-MR}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`+
+       `<text x="${ML-9}" y="${y(v)+4}" text-anchor="end" font-size="10.5" fill="var(--muted)">${Math.round(v/1000)}k</text>`;});
+  g+=`<line x1="${ML}" y1="${y(69700)}" x2="${W-MR}" y2="${y(69700)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".85"/>`+
+     `<text x="${W-MR}" y="${y(69700)-6}" text-anchor="end" font-size="10" fill="var(--muted)">renda</text>`;
+  totais.forEach((v,i)=>{
+    const atual=MESES[i].id===mesVigente();
+    g+=`<rect x="${xc(i)-bw/2}" y="${y(v)}" width="${bw}" height="${MT+ih-y(v)}" rx="4"
+          fill="var(--accent)" opacity="${atual?1:.62}"><title>${MESES[i].label}: ${brl(v)}</title></rect>`+
+       `<text x="${xc(i)}" y="${y(v)-6}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--txt)">${(v/1000).toFixed(1).replace('.',',')}k</text>`+
+       `<text x="${xc(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)"${atual?' font-weight="700"':''}>${MESES[i].label.slice(0,3)}</text>`;
+  });
+  document.getElementById('gerChart').innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Total das contas por mês comparado à renda">${g}</svg>`;
+
+  /* tabela conta × mês, com variação colorida vs mês anterior */
+  const num=v=>v>0?('R$ '+Math.round(v).toLocaleString('pt-BR')):'—';
+  let t='<table class="gt"><thead><tr><th>Conta</th>'+MESES.map(m=>`<th>${m.label.slice(0,3)}</th>`).join('')+'</tr></thead><tbody>';
+  CONTAS_DEF.map(cdef=>({cdef,vs:MESES.map((m,i)=>(VALORES[cdef.id]||[])[i]||0)}))
+    .sort((a,b)=>b.vs[0]-a.vs[0])
+    .forEach(({cdef,vs})=>{
+      t+=`<tr><td>${cdef.nome}</td>`+vs.map((v,i)=>{
+        const prev=i>0?vs[i-1]:v;
+        const cls=i>0&&v>prev?'up':(i>0&&v<prev?'dn':'');
+        return `<td class="${cls}">${num(v)}</td>`;
+      }).join('')+'</tr>';
+    });
+  t+=`<tr class="tot"><td>Total</td>`+totais.map(v=>`<td>${num(v)}</td>`).join('')+'</tr></tbody></table>';
+  document.getElementById('gerTabela').innerHTML=t;
+
+  document.getElementById('foot').innerHTML =
+    `Visão geral das contas · vermelho = subiu vs mês anterior, verde = caiu · dados de ${ATUALIZADO} · versão ${VERSAO}.<br>`+
     `A senha desta página só evita curiosos — não é criptografia. Não guarde nada sigiloso aqui.`;
 }
 
@@ -725,8 +879,9 @@ async function encolherImagem(f){
   });
 }
 document.getElementById('pagCopiar').onclick=()=>{
-  const linhas=PAGAMENTOS.map(p=>{
-    const st=pagEstado(p.id);
+  const mes=MESES.find(m=>m.id===mesSel)||MESES[0];
+  const linhas=`Contas de ${mes.label}:\n`+contasDoMes(mes.id).map(p=>{
+    const st=pagEstado(mes.id+':'+p.id);
     const flags=[st.pago?'PAGA':'pendente',
       st.cobranca?(st.cobranca.local?'cobrança neste aparelho':'cobrança ok'):'sem cobrança',
       st.comprovante?(st.comprovante.local?'comprovante neste aparelho':'comprovante ok'):'sem comprovante'];
