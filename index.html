@@ -239,8 +239,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "24/08/2026";
-const VERSAO     = "17";     // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "25/08/2026";
+const VERSAO     = "18";     // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -322,6 +322,7 @@ const CICLOS = [
       { data:"2026-08-23", desc:"Janta",           quem:"Tales",   valor:213.29, cat:"Alimentação" },
       { data:"2026-08-24", desc:"Almoço",          quem:"Tales",   valor:42.77,  cat:"Alimentação" },
       { data:"2026-08-24", desc:"Nova Camila Confeitaria", quem:"Tales", valor:159.96, cat:"Alimentação" },
+      { data:"2026-08-25", desc:"Pão de queijo (Oba)", quem:"Tales", valor:9.99, cat:"Alimentação" },
     ]
   },
   {
@@ -503,7 +504,11 @@ function render(){
     <div class="card">
       <div class="lbl">Ainda dá para gastar hoje</div>
       <div class="val" style="color:${podeHoje<=0?'var(--bad)':'inherit'}">${brl(Math.max(podeHoje,0))}</div>
-      <div class="note">${ehFds(HOJE)?'<b>fim de semana</b>':'dia útil'} · cota do dia ${brl(cotaHoje)}${gHoje>0?`<br>já lançado hoje: ${brl(gHoje)}`:''}${podeHoje<0?`<br><span style="color:var(--bad)">estourou a cota em ${brl(-podeHoje)}</span>`:''}</div>
+      <div class="note">${ehFds(HOJE)?'<b>fim de semana</b>':'dia útil'} · ${
+        cotaHoje>0 ? `cota do dia ${brl(cotaHoje)}` : 'sem cota — o orçamento do ciclo já acabou'
+      }${gHoje>0?`<br>já lançado hoje: ${brl(gHoje)}`:''}${podeHoje<0?`<br><span style="color:var(--bad)">${
+        cotaHoje>0 ? `estourou a cota em ${brl(-podeHoje)}` : `cada gasto de hoje aumenta o estouro`
+      }</span>`:''}</div>
     </div>
     <div class="card">
       <div class="lbl">Fins de semana restantes</div>
