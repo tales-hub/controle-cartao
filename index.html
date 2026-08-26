@@ -239,8 +239,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "25/08/2026";
-const VERSAO     = "20";     // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "26/08/2026";
+const VERSAO     = "21";     // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -331,7 +331,10 @@ const CICLOS = [
     orcamento:12000, wUtil:5, wFds:4,      // proporção R$500 útil : R$400 fds da regra semanal
     regras:["ritmo semanal: mais peso de seg a sex","checkpoints 25→20% · 50→50% · 75→75% · 90→90%","monitorar terças e quintas"],
     checkpoints:true,
-    lanc:[]
+    lanc:[
+      { data:"2026-08-26", desc:"Shopee (1ª de 2 parcelas)", quem:"Tales", valor:88.44,  cat:"Compras" },
+      { data:"2026-08-26", desc:"Mercado Livre",             quem:"Tales", valor:168.18, cat:"Compras" },
+    ]
   }
 ];
 /* ====================================================== */
@@ -412,7 +415,10 @@ document.getElementById('copiar').onclick=()=>{
 function renderTabs(){
   document.getElementById('tabs').innerHTML =
     `<span class="tabgrp">Cartão</span>`+
-    CICLOS.map(x=>`<button class="tab${x.id===ativo?' on':''}" data-t="${x.id}">${x.label}</button>`).join('')+
+    CICLOS.map(x=>{
+      const fim = hojeISO()>x.fim ? ' ✓' : '';
+      return `<button class="tab${x.id===ativo?' on':''}" data-t="${x.id}">${x.label}${fim}</button>`;
+    }).join('')+
     `<span class="tabsep"></span><span class="tabgrp">Contas</span>`+
     `<button class="tab${ativo==='pag'?' on':''}" data-t="pag">Mensal</button>`+
     `<button class="tab${ativo==='ger'?' on':''}" data-t="ger">Geral</button>`;
@@ -472,7 +478,11 @@ function render(){
   /* status + cor */
   const projecao=esperado>0?c.orcamento*(gasto/esperado):gasto;
   let cor='var(--ok)', rot='Dentro do plano', txt=`${brl(esperado-gasto)} abaixo do previsto até hoje`;
-  if(gasto>c.orcamento){cor='var(--bad)';rot='Estourou o orçamento';txt=`${brl(gasto-c.orcamento)} acima do limite`;}
+  if(encerrado){ rot='Ciclo encerrado';
+    txt = gasto>c.orcamento ? `fechou ${brl(gasto-c.orcamento)} acima do orçamento`
+                            : `fechou com ${brl(c.orcamento-gasto)} de sobra`;
+    cor = gasto>c.orcamento?'var(--bad)':'var(--ok)'; }
+  else if(gasto>c.orcamento){cor='var(--bad)';rot='Estourou o orçamento';txt=`${brl(gasto-c.orcamento)} acima do limite`;}
   else if(!futuroCiclo&&projecao>c.orcamento*1.02){cor='var(--bad)';rot='Acima do plano';txt=`no ritmo atual, fecha ${brl(projecao-c.orcamento)} acima`;}
   else if(!futuroCiclo&&gasto>esperado){cor='var(--warn)';rot='Atenção';txt=`${brl(gasto-esperado)} acima do previsto até hoje`;}
   else if(futuroCiclo){rot='Ciclo ainda não começou';txt=`orçamento ${brl(c.orcamento)} intacto`;}
@@ -500,6 +510,35 @@ function render(){
       <span class="dot"></span>${rot} — ${txt}</div>
     ${chkHtml}
   </div>`;
+  if(encerrado && TODOS.length){
+    /* resumo de fechamento do ciclo */
+    const dif=gasto-c.orcamento;
+    const diaTop=Object.entries(porDiaMap).sort((a,b)=>b[1]-a[1])[0];
+    const porCat={}; TODOS.forEach(l=>{ if(l.cat) porCat[l.cat]=(porCat[l.cat]||0)+l.valor; });
+    const catTop=Object.entries(porCat).sort((a,b)=>b[1]-a[1])[0];
+    const porQuem={}; TODOS.forEach(l=>{ porQuem[l.quem]=(porQuem[l.quem]||0)+l.valor; });
+    const quemOrd=Object.entries(porQuem).sort((a,b)=>b[1]-a[1]);
+    cards+=`
+    <div class="card">
+      <div class="lbl">Resultado final</div>
+      <div class="val" style="color:${dif>0?'var(--bad)':'var(--ok)'}">${dif>0?'+':'−'}${brl(Math.abs(dif))}</div>
+      <div class="note">${dif>0?'acima':'abaixo'} do orçamento · ${(gasto/c.orcamento*100).toFixed(0)}% do previsto</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Dia mais caro</div>
+      <div class="val">${diaTop?brl(diaTop[1]):'—'}</div>
+      <div class="note">${diaTop?`${d(diaTop[0]).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'})} · ${(diaTop[1]/gasto*100).toFixed(0)}% do ciclo`:''}</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Maior categoria</div>
+      <div class="val">${catTop?brl(catTop[1]):'—'}</div>
+      <div class="note">${catTop?`${catTop[0]} · ${(catTop[1]/gasto*100).toFixed(0)}% do ciclo`:''}</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Por pessoa</div>
+      <div class="val" style="font-size:19px;line-height:1.5">${quemOrd.map(([q,v])=>`${q} ${brl(v)}`).join('<br>')}</div>
+    </div>`;
+  }
   if(dentro){
     cards+=`
     <div class="card">
