@@ -155,7 +155,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 31 de 01/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 32 de 01/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -244,7 +244,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "01/09/2026";
-const VERSAO     = "31";     // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "32";     // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -367,7 +367,10 @@ const CICLOS = [
       { data:"2026-08-30", desc:"Vindi *yogibaby (1ª de 3 parcelas)", quem:"Nicolle", valor:107.51, cat:"Compras" },
       { data:"2026-08-31", desc:"Lâmpadas — sala da Nicolle", quem:"Tales", valor:67.90, cat:"Trabalho" },
       { data:"2026-08-31", desc:"99food",                     quem:"Tales", valor:92.72, cat:"Alimentação" },
-      { data:"2026-09-01", desc:"Barbearia Piox",             quem:"Tales", valor:65.00, cat:"Cuidados" },
+      { data:"2026-09-01", desc:"Barbearia Piox",             quem:"Tales", valor:65.00,  cat:"Cuidados" },
+      { data:"2026-09-01", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:129.70, cat:"Mercado" },
+      { data:"2026-09-01", desc:"Drogasil (1ª de 3 parcelas)",quem:"Tales", valor:113.40, cat:"Saúde" },
+      { data:"2026-09-01", desc:"Arruda estacionamento",      quem:"Tales", valor:25.00,  cat:"Transporte" },
     ]
   }
 ];
