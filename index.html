@@ -155,7 +155,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 32 de 01/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 33 de 01/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -244,7 +244,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "01/09/2026";
-const VERSAO     = "32";     // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "33";     // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -282,21 +282,21 @@ const CONTAS_DEF = [
 /* valores por conta, na ordem de MESES (set..mai). 0 = a conta não existe naquele mês. */
 const VALORES = {
   "aluguel-apto":  [19700,19700,19700,19700,19700,19700,19700,19700,19700],
-  "cartao-itau":   [18437,5000,4888,3464,2058,1553,848,529,224],
+  "cartao-itau":   [0,23900,4888,3464,2058,1553,848,529,224],
   "cartao-nubank": [7240,7000,3678,3678,2378,2378,1715,1007,611],
   "escola-miguel": [5957,5957,5957,5957,5957,5957,5957,5957,5957],
-  "sala-nicolle":  [4000,4000,4000,4000,3500,3500,3500,3500,3500],
+  "sala-nicolle":  [3900,4000,4000,4000,3500,3500,3500,3500,3500],
   "financ-carro":  [2877,2877,2877,2877,2877,2877,2877,2877,2877],
   "consorcio-400": [2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39],
   "diarista":      [2430,2430,2430,2430,2430,2430,2430,2430,2430],
-  "pix-geral":     [1500,1500,1500,1500,1500,1500,1500,0,0],
-  "cartao-rico":   [1084,89,89,45,45,45,45,45,45],
+  "pix-geral":     [1400,1500,1500,1500,1500,1500,1500,0,0],
+  "cartao-rico":   [1315,89,89,45,45,45,45,45,45],
   "personal":      [900,900,900,900,900,900,900,900,900],
   "pos-nicolle":   [848,848,848,848,848,848,848,848,848],
   "consorcio-50":  [711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50],
-  "cartao-santa":  [649,649,546,426,0,0,0,0,0],
+  "cartao-santa":  [644,649,546,426,0,0,0,0,0],
   "luz":           [300,300,300,300,300,300,300,300,300],
-  "cartao-porto":  [200,300,300,300,300,300,300,300,300],
+  "cartao-porto":  [101,300,300,300,300,300,300,300,300],
   "internet":      [166,166,166,166,166,166,166,166,166],
 };
 /* cobranças e comprovantes oficiais embutidos pelo Claude, por "mesId:contaId":
