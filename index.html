@@ -155,7 +155,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 33 de 01/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 34 de 01/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -244,7 +244,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "01/09/2026";
-const VERSAO     = "33";     // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "34";     // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -260,24 +260,25 @@ const MESES = [
   { id:"2027-04", label:"Abr/27", renda:79700 },
   { id:"2027-05", label:"Mai/27", renda:79700 },
 ];
+/* venc = dia do mês (1–31). vencNota = quando não há dia fixo. Datas informadas pelo Tales em 01/09. */
 const CONTAS_DEF = [
-  { id:"aluguel-apto",  nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           venc:null, resp:"Casa" },
-  { id:"cartao-itau",   nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           venc:null, resp:"Casa" },
-  { id:"cartao-nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           venc:null, resp:"Casa" },
-  { id:"escola-miguel", nome:"Escola do Miguel",                     grupo:"Educação",          venc:null, resp:"Casa" },
-  { id:"sala-nicolle",  nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", venc:null, resp:"Nicolle" },
-  { id:"financ-carro",  nome:"Financiamento do carro",               grupo:"Transporte",        venc:null, resp:"Casa" },
-  { id:"consorcio-400", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      venc:null, resp:"Casa" },
-  { id:"diarista",      nome:"Diarista",                             grupo:"Serviços do Lar",   venc:null, resp:"Casa" },
-  { id:"pix-geral",     nome:"Pix Geral",                            grupo:"Variáveis",         venc:null, resp:"Casa" },
-  { id:"cartao-rico",   nome:"Cartão Rico",                          grupo:"Cartões",           venc:null, resp:"Casa" },
-  { id:"personal",      nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", venc:null, resp:"Casa" },
-  { id:"pos-nicolle",   nome:"Pós-graduação da Nicolle",             grupo:"Educação",          venc:null, resp:"Nicolle" },
-  { id:"consorcio-50",  nome:"Consórcio do carro (R$ 50 mil)",       grupo:"Investimento",      venc:null, resp:"Casa" },
-  { id:"cartao-santa",  nome:"Cartão Santander",                     grupo:"Cartões",           venc:null, resp:"Casa" },
-  { id:"luz",           nome:"Luz",                                  grupo:"Serviços do Lar",   venc:null, resp:"Casa" },
-  { id:"cartao-porto",  nome:"Cartão Porto Seguro",                  grupo:"Cartões",           venc:null, resp:"Casa" },
-  { id:"internet",      nome:"Internet",                             grupo:"Serviços do Lar",   venc:null, resp:"Casa" },
+  { id:"aluguel-apto",  nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           venc:10,   resp:"Casa" },
+  { id:"cartao-itau",   nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           venc:null, vencNota:"data a confirmar", resp:"Casa" },
+  { id:"cartao-nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"escola-miguel", nome:"Escola do Miguel",                     grupo:"Educação",          venc:5,    resp:"Casa" },
+  { id:"sala-nicolle",  nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", venc:10, resp:"Nicolle" },
+  { id:"financ-carro",  nome:"Financiamento do carro",               grupo:"Transporte",        venc:6,    resp:"Casa" },
+  { id:"consorcio-400", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      venc:null, vencNota:"data a confirmar", resp:"Casa" },
+  { id:"diarista",      nome:"Diarista",                             grupo:"Serviços do Lar",   venc:null, vencNota:"durante o mês", resp:"Casa" },
+  { id:"pix-geral",     nome:"Pix Geral",                            grupo:"Variáveis",         venc:null, vencNota:"durante o mês", resp:"Casa" },
+  { id:"cartao-rico",   nome:"Cartão Rico",                          grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"personal",      nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", venc:1,    resp:"Casa" },
+  { id:"pos-nicolle",   nome:"Pós-graduação da Nicolle",             grupo:"Educação",          venc:null, vencNota:"data a confirmar", resp:"Nicolle" },
+  { id:"consorcio-50",  nome:"Consórcio do carro (R$ 50 mil)",       grupo:"Investimento",      venc:30,   resp:"Casa" },
+  { id:"cartao-santa",  nome:"Cartão Santander",                     grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"luz",           nome:"Luz",                                  grupo:"Serviços do Lar",   venc:8,    resp:"Casa" },
+  { id:"cartao-porto",  nome:"Cartão Porto Seguro",                  grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"internet",      nome:"Internet",                             grupo:"Serviços do Lar",   venc:10,   resp:"Casa" },
 ];
 /* valores por conta, na ordem de MESES (set..mai). 0 = a conta não existe naquele mês. */
 const VALORES = {
@@ -302,7 +303,14 @@ const VALORES = {
 /* cobranças e comprovantes oficiais embutidos pelo Claude, por "mesId:contaId":
    OFICIAL["2026-09:aluguel-apto"] = { cobranca:{tipo:"pix"|"barras"|"arquivo", texto?, dataUri?,
    nomeArq?, mime?}, comprovante:{...}, pago:true|false } */
-const OFICIAL = {};
+const OFICIAL = {
+  /* pagas confirmadas pelo Tales em 01/09 (vencimento dia 1) */
+  "2026-09:cartao-nubank": { pago:true },
+  "2026-09:cartao-rico":   { pago:true },
+  "2026-09:personal":      { pago:true },
+  "2026-09:cartao-santa":  { pago:true },
+  "2026-09:cartao-porto":  { pago:true },
+};
 
 const CICLOS = [
   {
@@ -756,10 +764,34 @@ function mesVigente(){
   return t<'2026-08-26' ? MESES[0].id : MESES[MESES.length-1].id;
 }
 let mesSel=null;
+/* data de vencimento real dentro do mês do rótulo (Set/26 → setembro de 2026) */
+function dataVenc(mid,dia){
+  if(!dia) return null;
+  const [y,m]=mid.split('-').map(Number);
+  const ultimo=new Date(y,m,0).getDate();          // último dia daquele mês
+  return iso(new Date(y,m-1,Math.min(dia,ultimo)));
+}
 function contasDoMes(mid){
   const i=MESES.findIndex(m=>m.id===mid);
-  return CONTAS_DEF.map(cdef=>({...cdef, valor:(VALORES[cdef.id]||[])[i]||0}))
-    .filter(p=>p.valor>0).sort((a,b)=>b.valor-a.valor);
+  const hoje=hojeISO();
+  return CONTAS_DEF.map(cdef=>{
+    const dv=dataVenc(mid,cdef.venc);
+    const pago=pagEstado(mid+':'+cdef.id).pago;
+    let situacao='normal', dias=null;
+    if(dv && !pago){
+      dias=difDias(hoje,dv);
+      if(dias<0) situacao='atrasada';
+      else if(dias<=3) situacao='vence-logo';
+    }
+    return {...cdef, valor:(VALORES[cdef.id]||[])[i]||0, dv, pago, situacao, dias};
+  })
+  .filter(p=>p.valor>0)
+  .sort((a,b)=>{
+    if(a.pago!==b.pago) return a.pago?1:-1;          // não pagas primeiro
+    const da=a.venc??99, db=b.venc??99;
+    if(da!==db) return da-db;                         // depois por dia de vencimento
+    return b.valor-a.valor;                           // desempate pelo valor
+  });
 }
 
 function renderPagamentos(){
@@ -782,6 +814,11 @@ function renderPagamentos(){
     `<span class="rule">Total do mês ${brl(total)}</span>`+
     `<span class="rule">renda prevista ${brl(mes.renda)} · sobra projetada ${brl(mes.renda-total)}</span>`;
 
+  const atrasadas=lista.filter(p=>p.situacao==='atrasada');
+  const proximas=lista.filter(p=>!p.pago&&p.dv&&p.dias>=0).sort((a,b)=>a.dias-b.dias);
+  const prox=proximas[0];
+  const semData=lista.filter(p=>!p.pago&&!p.dv);
+
   document.getElementById('pagResumo').innerHTML = `
   <div class="card big">
     <div class="lbl">Pago até agora — ${mes.label}</div>
@@ -789,17 +826,43 @@ function renderPagamentos(){
     <div class="barwrap"><div class="barfill"><div class="bar" style="width:${pct}%;background:var(--ok)"></div></div></div>
     <div class="legend"><span>${pagos.length} de ${lista.length} contas pagas (${pct.toFixed(0)}%)</span>
       <span>falta ${brl(total-vPago)}</span></div>
+    ${atrasadas.length?`<div class="chk" style="color:var(--bad)"><b>${atrasadas.length} conta(s) vencida(s)</b> — ${brl(atrasadas.reduce((s,p)=>s+p.valor,0))}: ${atrasadas.map(p=>p.nome.split(' ')[0]).join(', ')}</div>`:''}
+  </div>
+  <div class="card">
+    <div class="lbl">Próximo vencimento</div>
+    <div class="val" style="font-size:20px;line-height:1.3">${prox?`${fmtD(prox.dv)}`:'—'}</div>
+    <div class="note">${prox?`${prox.nome} · ${brl(prox.valor)}<br>${prox.dias===0?'<b>é hoje</b>':prox.dias===1?'amanhã':`em ${prox.dias} dias`}`:'nada a vencer'}</div>
+  </div>
+  <div class="card">
+    <div class="lbl">A pagar até o dia 10</div>
+    <div class="val">${brl(proximas.filter(p=>p.venc<=10).reduce((s,p)=>s+p.valor,0))}</div>
+    <div class="note">${proximas.filter(p=>p.venc<=10).length} conta(s) com data marcada</div>
+  </div>
+  <div class="card">
+    <div class="lbl">Sem data definida</div>
+    <div class="val">${brl(semData.reduce((s,p)=>s+p.valor,0))}</div>
+    <div class="note">${semData.length?semData.map(p=>p.nome.split(' ')[0]).join(' · '):'nenhuma'}</div>
   </div>`;
 
   const el=document.getElementById('pagLista');
   el.innerHTML = lista.map(p=>{
     const st=pagEstado(mesSel+':'+p.id);
-    return `<div class="conta${st.pago?' paga':''}" data-id="${mesSel}:${p.id}">
+    const venctxt = p.dv
+      ? `vence ${fmtD(p.dv)}` + (st.pago?'' :
+          p.situacao==='atrasada' ? ` · <b style="color:var(--bad)">venceu há ${-p.dias} dia(s)</b>`
+          : p.dias===0 ? ' · <b style="color:var(--warn)">é hoje</b>'
+          : p.dias<=3 ? ` · <b style="color:var(--warn)">em ${p.dias} dia(s)</b>`
+          : ` · em ${p.dias} dias`)
+      : (p.vencNota||'sem data');
+    const borda = st.pago ? '' :
+      p.situacao==='atrasada' ? 'style="border-color:var(--bad)"'
+      : p.situacao==='vence-logo' ? 'style="border-color:var(--warn)"' : '';
+    return `<div class="conta${st.pago?' paga':''}" ${borda} data-id="${mesSel}:${p.id}">
       <div class="topo">
         <div>
-          <div class="nome">${st.pago?'✅ ':''}${p.nome}</div>
+          <div class="nome">${st.pago?'✅ ':p.situacao==='atrasada'?'⚠️ ':''}${p.nome}</div>
           <div class="meta"><span class="grpchip">${p.grupo}</span> <span class="respchip">${p.resp}</span>
-            ${p.venc?` · vence dia ${p.venc}`:' · vencimento não informado'}</div>
+            · ${venctxt}</div>
         </div>
         <div style="text-align:right">
           <div class="valor">${brl(p.valor)}</div>
