@@ -155,7 +155,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 36 de 04/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 37 de 04/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -244,7 +244,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "04/09/2026";
-const VERSAO     = "36";   // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "37";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -296,9 +296,9 @@ const VALORES = {
   "pos-nicolle":   [848,848,848,848,848,848,848,848,848],
   "consorcio-50":  [711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50],
   "cartao-santa":  [644,649,546,426,0,0,0,0,0],
-  "luz":           [300,300,300,300,300,300,300,300,300],
+  "luz":           [361.34,300,300,300,300,300,300,300,300],   /* set/26: valor real da conta (08/09) */
   "cartao-porto":  [101,300,300,300,300,300,300,300,300],
-  "internet":      [166,166,166,166,166,166,166,166,166],
+  "internet":      [156,166,166,166,166,166,166,166,166],      /* set/26: valor efetivamente pago */
 };
 /* cobranças e comprovantes oficiais embutidos pelo Claude, por "mesId:contaId":
    OFICIAL["2026-09:aluguel-apto"] = { cobranca:{tipo:"pix"|"barras"|"arquivo", texto?, dataUri?,
@@ -310,6 +310,8 @@ const OFICIAL = {
   "2026-09:personal":      { pago:true },
   "2026-09:cartao-santa":  { pago:true },
   "2026-09:cartao-porto":  { pago:true },
+  /* paga em 04/09 — R$ 156 (valor confirmado pelo Tales) */
+  "2026-09:internet":      { pago:true },
 };
 
 const CICLOS = [
