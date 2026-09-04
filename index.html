@@ -124,8 +124,11 @@
   button:active{transform:translateY(1px)}
   .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500;
        font-size:12px;padding:7px 12px;border-radius:99px}
-  .form{display:grid;grid-template-columns:1fr 120px 130px auto;gap:10px}
-  @media(max-width:640px){ .form{grid-template-columns:1fr 1fr} .form .f-desc{grid-column:1/-1} .form button{grid-column:1/-1} }
+  .form{display:grid;grid-template-columns:1fr auto;gap:10px}
+  @media(max-width:640px){ .form{grid-template-columns:1fr} }
+  .lido{margin-top:10px;font-size:13px;color:var(--muted);min-height:18px}
+  .lido b{color:var(--fg)}
+  .lido.erro{color:#c0392b}
   .del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:15px;line-height:1}
   .del:hover{color:var(--bad)}
   #chartWrap{position:relative}
@@ -155,7 +158,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 39 de 04/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 40 de 04/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -180,12 +183,15 @@
 <h2>Lançar gasto</h2>
 <div class="card">
   <div class="form">
-    <input class="f-desc" id="fDesc" placeholder="Descrição (ex: mercado)">
-    <input id="fValor" type="text" inputmode="decimal" placeholder="R$ 0,00">
-    <select id="fQuem"><option>Tales</option><option>Nicolle</option><option>Os dois</option></select>
+    <input class="f-desc" id="fDesc" autocomplete="off" placeholder="Escreva como no chat: 138,98 oba">
     <button id="fAdd">Adicionar</button>
   </div>
+  <div class="lido" id="fLido"></div>
   <div class="note" style="margin-top:12px">
+    Escreva do mesmo jeito que você me manda na conversa — <b>valor e descrição na mesma linha</b>.
+    Escreva <b>Nicolle</b> no texto se o gasto foi dela, e <b>ontem</b> se o gasto não foi de hoje.<br>
+    <b>Print de tela continua indo no chat</b> — lá eu consigo ler a imagem e lançar sozinho.
+    Aqui a página não enxerga imagem.<br>
     Lançamentos feitos aqui ficam salvos <b>só neste aparelho</b>. Para virarem oficiais nos dois celulares,
     use “copiar para o chat” abaixo e cole na conversa com o Claude.
   </div>
@@ -244,7 +250,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "04/09/2026";
-const VERSAO     = "39";   // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "40";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -444,15 +450,58 @@ function cicloVigente(){
 function setTab(id){ ativo=id; render(); }   /* não persiste: a página sempre reabre no ciclo vigente */
 
 /* ---------- formulário ---------- */
-document.getElementById('fAdd').onclick=()=>{
-  const desc=document.getElementById('fDesc').value.trim();
-  const raw=document.getElementById('fValor').value.replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}\b)/g,'').replace(',','.');
+/* Lê uma linha escrita no formato do chat: "138,98 oba", "oba 138,98",
+   "255 manicure nicolle", "60 almoço ontem". Um campo só — sem menus para escolher. */
+function lerLinha(txt){
+  const t=(txt||'').trim();
+  if(!t) return null;
+  const m=t.match(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:[.,]\d{1,2})?)/);
+  if(!m) return null;
+  let raw=m[1];
+  if(raw.includes(',')) raw=raw.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(raw)) raw=raw.replace(/\./g,'');
   const valor=parseFloat(raw);
-  if(!desc||!isFinite(valor)||valor<=0){ alert('Preencha a descrição e um valor válido.'); return; }
+  if(!isFinite(valor)||valor<=0) return null;
+
+  let desc=(t.slice(0,m.index)+' '+t.slice(m.index+m[0].length)).replace(/R\$/gi,' ');
+
+  /* quem gastou — sem menu: basta escrever o nome no texto. Padrão: Tales. */
+  let quem='Tales';
+  if(/\b(os\s+dois|n[óo]s\s+dois|ambos)\b/i.test(desc)){ quem='Os dois'; desc=desc.replace(/\b(os\s+dois|n[óo]s\s+dois|ambos)\b/ig,' '); }
+  else if(/\bnicolle?\b/i.test(desc)){ quem='Nicolle'; desc=desc.replace(/\bnicolle?\b/ig,' '); }
+  else if(/\btales\b/i.test(desc)){ desc=desc.replace(/\btales\b/ig,' '); }
+
+  /* data — "ontem" / "anteontem" para lançamentos que chegaram atrasados */
+  let dias=0;
+  if(/\banteontem\b/i.test(desc)){ dias=2; desc=desc.replace(/\banteontem\b/ig,' '); }
+  else if(/\bontem\b/i.test(desc)){ dias=1; desc=desc.replace(/\bontem\b/ig,' '); }
+  const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-dias);
+  const data=iso(d);
+
+  desc=desc.replace(/\s+/g,' ').replace(/^[\s\-–—:,.]+|[\s\-–—:,.]+$/g,'');
+  if(!desc) desc='(sem descrição)';
+  return {data,desc,quem,valor:Math.round(valor*100)/100};
+}
+
+const elLido=document.getElementById('fLido');
+function previa(){
+  const p=lerLinha(document.getElementById('fDesc').value);
+  if(!document.getElementById('fDesc').value.trim()){ elLido.className='lido'; elLido.textContent=''; return; }
+  if(!p){ elLido.className='lido erro'; elLido.textContent='Não achei um valor nessa linha — escreva o número, ex.: 138,98 oba'; return; }
+  elLido.className='lido';
+  elLido.innerHTML=`entendi: <b>${brl(p.valor)}</b> · ${p.desc} · ${p.quem} · ${fmtD(p.data)}`;
+}
+document.getElementById('fDesc').addEventListener('input',previa);
+document.getElementById('fDesc').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('fAdd').click(); });
+
+document.getElementById('fAdd').onclick=()=>{
+  const campo=document.getElementById('fDesc');
+  const p=lerLinha(campo.value);
+  if(!p){ previa(); campo.focus(); return; }
   const a=locais();
-  a.push({data:hojeISO(),desc,quem:document.getElementById('fQuem').value,valor:Math.round(valor*100)/100,local:true});
+  a.push({...p,local:true});
   salvarLocais(a);
-  document.getElementById('fDesc').value=''; document.getElementById('fValor').value='';
+  campo.value=''; previa();
   render();
 };
 document.getElementById('copiar').onclick=()=>{
