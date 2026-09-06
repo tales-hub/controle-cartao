@@ -158,7 +158,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 40 de 04/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 41 de 06/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -249,8 +249,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "04/09/2026";
-const VERSAO     = "40";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "06/09/2026";
+const VERSAO     = "41";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -393,6 +393,17 @@ const CICLOS = [
       { data:"2026-09-03", desc:"Fikbella Perfumaria (1ª de 6 parcelas)", quem:"Tales", valor:45.16, cat:"Cuidados" },
       { data:"2026-09-03", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:28.67,  cat:"Mercado" },
       { data:"2026-09-04", desc:"Oba Hortifruti",             quem:"Tales", valor:138.98, cat:"Mercado" },
+      { data:"2026-09-04", desc:"iFood — NP Farma",           quem:"Nicolle", valor:107.94, cat:"Saúde" },
+      { data:"2026-09-04", desc:"Mercado Livre",              quem:"Tales", valor:130.00, cat:"Compras" },
+      { data:"2026-09-04", desc:"Padaria e restaurante",      quem:"Tales", valor:32.00,  cat:"Alimentação" },
+      { data:"2026-09-04", desc:"Uber",                       quem:"Tales", valor:10.98,  cat:"Transporte" },
+      { data:"2026-09-04", desc:"Uber",                       quem:"Tales", valor:5.00,   cat:"Transporte" },
+      { data:"2026-09-04", desc:"99app",                      quem:"Nicolle", valor:5.00, cat:"Transporte" },
+      /* 04/09: "uber uber * pending R$ 15,94" aparece riscado no extrato = estornado. Não lançado. */
+      { data:"2026-09-05", desc:"99food",                     quem:"Tales", valor:211.19, cat:"Alimentação" },
+      { data:"2026-09-05", desc:"Vila dos Smurfs Park (1ª de 6 parcelas)", quem:"Tales", valor:67.03, cat:"Lazer" },
+      { data:"2026-09-05", desc:"Allpark estacionamento",     quem:"Tales", valor:60.00,  cat:"Transporte" },
+      { data:"2026-09-06", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:32.16,  cat:"Mercado" },
     ]
   }
 ];
