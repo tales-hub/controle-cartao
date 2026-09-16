@@ -158,7 +158,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 47 de 14/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 48 de 16/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -249,8 +249,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "14/09/2026";
-const VERSAO     = "47";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "16/09/2026";
+const VERSAO     = "48";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -447,6 +447,20 @@ const CICLOS = [
       { data:"2026-09-13", desc:"Zara Vila Lobos (1ª de 3 parcelas)", quem:"Tales", valor:78.00, cat:"Compras" },
       { data:"2026-09-13", desc:"Daiso Brasil",               quem:"Tales", valor:40.96,  cat:"Compras" },
       { data:"2026-09-13", desc:"Ri Happy Brinquedos (1ª de 5 parcelas)", quem:"Tales", valor:32.38, cat:"Compras" },
+      { data:"2026-09-14", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:424.65, cat:"Mercado" },
+      { data:"2026-09-14", desc:"99food",                     quem:"Tales", valor:111.63, cat:"Alimentação" },
+      { data:"2026-09-14", desc:"Mercado Livre *shopligh",    quem:"Tales", valor:38.97,  cat:"Compras" },
+      { data:"2026-09-14", desc:"Uber",                       quem:"Tales", valor:18.03,  cat:"Transporte" },
+      /* 15/09: dois lançamentos Ferticlin quase idênticos (400,01 e 400,00) — pagamento dividido,
+         a confirmar com o Tales. Lançados os dois. */
+      { data:"2026-09-15", desc:"Ferticlin Clínica",          quem:"Tales", valor:400.01, cat:"Saúde" },
+      { data:"2026-09-15", desc:"Ferticlin Clínica",          quem:"Tales", valor:400.00, cat:"Saúde" },
+      { data:"2026-09-15", desc:"iFood — La Nonna di Lucca",  quem:"Tales", valor:164.58, cat:"Alimentação" },
+      { data:"2026-09-15", desc:"Ana Caroline (salão)",       quem:"Tales", valor:150.00, cat:"Cuidados" },
+      { data:"2026-09-15", desc:"Padaria e restaurante",      quem:"Tales", valor:114.04, cat:"Alimentação" },
+      { data:"2026-09-15", desc:"Ana Caroline (salão)",       quem:"Tales", valor:106.00, cat:"Cuidados" },
+      { data:"2026-09-15", desc:"Arruda estacionamento",      quem:"Tales", valor:25.00,  cat:"Transporte" },
+      { data:"2026-09-15", desc:"Uber",                       quem:"Tales", valor:9.45,   cat:"Transporte" },
     ]
   }
 ];
