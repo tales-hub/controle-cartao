@@ -25,12 +25,22 @@
        -webkit-font-smoothing:antialiased;padding:24px 16px 56px}
   .wrap{max-width:860px;margin:0 auto}
   h1{font-size:20px;margin:0 0 12px;font-weight:650;letter-spacing:-.01em}
-  .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
-  .tab{font:inherit;font-size:14px;font-weight:600;padding:9px 20px;border-radius:99px;cursor:pointer;
-       background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+  /* abas: uma faixa só, sem quebra — rola para o lado no celular */
+  .tabs{display:flex;gap:6px;margin:0 -16px 12px;padding:0 16px;align-items:center;
+        flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs>*{flex:none}
+  .tab{font:inherit;font-size:14px;font-weight:600;padding:8px 16px;border-radius:99px;cursor:pointer;
+       background:var(--panel2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
   .tab.on{background:var(--accent);color:#fff;border-color:transparent}
-  .tabsep{width:1px;height:24px;background:var(--line);margin:0 4px}
+  .tabsep{width:1px;height:22px;background:var(--line);margin:0 6px}
   .tabgrp{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-right:2px}
+  /* linha de regras compacta (substitui os chips grandes) */
+  .regras{font-size:12px;color:var(--muted);line-height:1.6;margin:-2px 0 6px}
+  .regras b{color:var(--txt);font-weight:600}
+  .regras .sep{opacity:.45;margin:0 2px}
+  .aviso{display:inline-block;font-size:11px;color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 50%,transparent);
+         border-radius:99px;padding:2px 9px;margin-left:4px;vertical-align:1px}
   /* contas do mês */
   .conta{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
   .conta.paga{border-color:color-mix(in srgb, var(--ok) 45%, var(--line))}
@@ -57,7 +67,9 @@
   .grpchip{font-size:11px;color:var(--muted);background:var(--panel2);padding:2px 8px;border-radius:99px}
   .respchip{font-size:11px;color:var(--accent);border:1px solid var(--line);padding:2px 8px;border-radius:99px}
   .mchip{font:inherit;font-size:12px;font-weight:600;padding:7px 13px;border-radius:99px;cursor:pointer;
-       background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+       background:var(--panel2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+  .conta.confirmar{border-color:color-mix(in srgb, var(--warn) 55%, var(--line))}
+  .conta.atrasada{border-color:var(--bad)}
   .mchip.on{background:var(--txt);color:var(--bg);border-color:transparent}
   .gt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
   .gt th{position:sticky;left:auto;text-align:right;padding:6px 8px;font-size:10.5px}
@@ -95,6 +107,18 @@
   tr:last-child td{border-bottom:none}
   .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   .day td{background:var(--panel2);font-weight:600;font-size:13px}
+  .day .dayrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .day .cota{display:block;color:var(--muted);font-weight:400;font-size:11px;white-space:nowrap;line-height:1.4}
+  .day .cota.estourou{color:var(--bad)}
+  .parcchip{font-size:10.5px;color:var(--muted);border:1px dashed var(--line);
+       padding:1px 6px;border-radius:99px;margin-left:6px}
+  .parcchip.auto{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 50%,transparent)}
+  .vermais{display:block;width:100%;margin-top:8px;background:transparent;color:var(--accent);
+       border:1px dashed var(--line);border-radius:12px;padding:11px;font-weight:600;font-size:13px}
+  .proj2{display:flex;gap:14px;margin-top:8px}
+  .proj2 div{flex:1}
+  .proj2 .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .proj2 .v{font-size:17px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums}
   .day .fds{font-size:10px;color:var(--accent);border:1px solid var(--accent);
      padding:1px 6px;border-radius:99px;margin-left:8px;font-weight:600;vertical-align:1px}
   .who{font-size:11px;color:var(--muted);background:var(--panel2);
@@ -127,7 +151,7 @@
   .form{display:grid;grid-template-columns:1fr auto;gap:10px}
   @media(max-width:640px){ .form{grid-template-columns:1fr} }
   .lido{margin-top:10px;font-size:13px;color:var(--muted);min-height:18px}
-  .lido b{color:var(--fg)}
+  .lido b{color:var(--txt)}
   .lido.erro{color:#c0392b}
   .del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:15px;line-height:1}
   .del:hover{color:var(--bad)}
@@ -158,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 49 de 17/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 50 de 18/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -175,27 +199,10 @@
 <h1>Controle do Cartão</h1>
 <div class="tabs" id="tabs"></div>
 <div class="sub" id="sub"></div>
-<div id="regras"></div>
+<div class="regras" id="regras"></div>
 
 <div id="viewCartao">
 <div class="grid" id="cards"></div>
-
-<h2>Lançar gasto</h2>
-<div class="card">
-  <div class="form">
-    <input class="f-desc" id="fDesc" autocomplete="off" placeholder="Escreva como no chat: 138,98 oba">
-    <button id="fAdd">Adicionar</button>
-  </div>
-  <div class="lido" id="fLido"></div>
-  <div class="note" style="margin-top:12px">
-    Escreva do mesmo jeito que você me manda na conversa — <b>valor e descrição na mesma linha</b>.
-    Escreva <b>Nicolle</b> no texto se o gasto foi dela, e <b>ontem</b> se o gasto não foi de hoje.<br>
-    <b>Print de tela continua indo no chat</b> — lá eu consigo ler a imagem e lançar sozinho.
-    Aqui a página não enxerga imagem.<br>
-    Lançamentos feitos aqui ficam salvos <b>só neste aparelho</b>. Para virarem oficiais nos dois celulares,
-    use “copiar para o chat” abaixo e cole na conversa com o Claude.
-  </div>
-</div>
 
 <h2>Ritmo do ciclo</h2>
 <div class="card">
@@ -212,12 +219,26 @@
   <div class="card" id="cats"></div>
 </div>
 
+<h2>Lançar gasto</h2>
+<div class="card">
+  <div class="form">
+    <input class="f-desc" id="fDesc" autocomplete="off" placeholder="Escreva como no chat: 138,98 oba">
+    <button id="fAdd">Adicionar</button>
+  </div>
+  <div class="lido" id="fLido"></div>
+  <div class="note" style="margin-top:12px">
+    Mesmo formato do chat: <b>valor e descrição na mesma linha</b>. <b>Nicolle</b> no texto = gasto dela;
+    <b>ontem</b> = data de ontem. Print continua indo no chat (a página não lê imagem).
+    O que é lançado aqui fica <b>só neste aparelho</b> até você usar “copiar para o chat”.
+  </div>
+</div>
+
 <h2>Lançamentos <button class="btn-ghost" id="copiar">copiar para o chat</button></h2>
 <div id="tabela"></div>
 </div><!-- /viewCartao -->
 
 <div id="viewPag" style="display:none">
-  <div class="tabs" id="mchips" style="margin-bottom:6px"></div>
+  <div class="tabs" id="mchips" style="margin-bottom:10px"></div>
   <div class="grid" id="pagResumo"></div>
   <h2>Contas do mês <button class="btn-ghost" id="pagCopiar">copiar situação para o chat</button></h2>
   <div id="pagLista"></div>
@@ -249,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "17/09/2026";
-const VERSAO     = "49";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "18/09/2026";
+const VERSAO     = "50";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -268,23 +289,23 @@ const MESES = [
 ];
 /* venc = dia do mês (1–31). vencNota = quando não há dia fixo. Datas informadas pelo Tales em 01/09. */
 const CONTAS_DEF = [
-  { id:"aluguel-apto",  nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           venc:10,   resp:"Casa" },
-  { id:"cartao-itau",   nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           venc:null, vencNota:"data a confirmar", resp:"Casa" },
-  { id:"cartao-nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           venc:1,    resp:"Casa" },
-  { id:"escola-miguel", nome:"Escola do Miguel",                     grupo:"Educação",          venc:5,    resp:"Casa" },
-  { id:"sala-nicolle",  nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", venc:10, resp:"Nicolle" },
-  { id:"financ-carro",  nome:"Financiamento do carro",               grupo:"Transporte",        venc:6,    resp:"Casa" },
-  { id:"consorcio-400", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      venc:null, vencNota:"data a confirmar", resp:"Casa" },
-  { id:"diarista",      nome:"Diarista",                             grupo:"Serviços do Lar",   venc:null, vencNota:"durante o mês", resp:"Casa" },
-  { id:"pix-geral",     nome:"Pix Geral",                            grupo:"Variáveis",         venc:null, vencNota:"durante o mês", resp:"Casa" },
-  { id:"cartao-rico",   nome:"Cartão Rico",                          grupo:"Cartões",           venc:1,    resp:"Casa" },
-  { id:"personal",      nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", venc:1,    resp:"Casa" },
-  { id:"pos-nicolle",   nome:"Pós-graduação da Nicolle",             grupo:"Educação",          venc:null, vencNota:"data a confirmar", resp:"Nicolle" },
-  { id:"consorcio-50",  nome:"Consórcio do carro (R$ 50 mil)",       grupo:"Investimento",      venc:30,   resp:"Casa" },
-  { id:"cartao-santa",  nome:"Cartão Santander",                     grupo:"Cartões",           venc:1,    resp:"Casa" },
-  { id:"luz",           nome:"Luz",                                  grupo:"Serviços do Lar",   venc:8,    resp:"Casa" },
-  { id:"cartao-porto",  nome:"Cartão Porto Seguro",                  grupo:"Cartões",           venc:1,    resp:"Casa" },
-  { id:"internet",      nome:"Internet",                             grupo:"Serviços do Lar",   venc:10,   resp:"Casa" },
+  { id:"aluguel-apto",  curto:"Aluguel apto", nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           venc:10,   resp:"Casa" },
+  { id:"cartao-itau",   curto:"Itaú", nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           venc:null, vencNota:"data a confirmar", resp:"Casa" },
+  { id:"cartao-nubank", curto:"Nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"escola-miguel", curto:"Escola", nome:"Escola do Miguel",                     grupo:"Educação",          venc:5,    resp:"Casa" },
+  { id:"sala-nicolle",  curto:"Sala Nicolle", nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", venc:10, resp:"Nicolle" },
+  { id:"financ-carro",  curto:"Financiamento", nome:"Financiamento do carro",               grupo:"Transporte",        venc:6,    resp:"Casa" },
+  { id:"consorcio-400", curto:"Consórcio 400k", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      venc:null, vencNota:"data a confirmar", resp:"Casa" },
+  { id:"diarista",      curto:"Diarista", nome:"Diarista",                             grupo:"Serviços do Lar",   venc:null, vencNota:"durante o mês", resp:"Casa" },
+  { id:"pix-geral",     curto:"Pix geral", nome:"Pix Geral",                            grupo:"Variáveis",         venc:null, vencNota:"durante o mês", resp:"Casa" },
+  { id:"cartao-rico",   curto:"Rico", nome:"Cartão Rico",                          grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"personal",      curto:"Personal", nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", venc:1,    resp:"Casa" },
+  { id:"pos-nicolle",   curto:"Pós Nicolle", nome:"Pós-graduação da Nicolle",             grupo:"Educação",          venc:null, vencNota:"data a confirmar", resp:"Nicolle" },
+  { id:"consorcio-50",  curto:"Consórcio carro", nome:"Consórcio do carro (R$ 50 mil)",       grupo:"Investimento",      venc:30,   resp:"Casa" },
+  { id:"cartao-santa",  curto:"Santander", nome:"Cartão Santander",                     grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"luz",           curto:"Luz", nome:"Luz",                                  grupo:"Serviços do Lar",   venc:8,    resp:"Casa" },
+  { id:"cartao-porto",  curto:"Porto", nome:"Cartão Porto Seguro",                  grupo:"Cartões",           venc:1,    resp:"Casa" },
+  { id:"internet",      curto:"Internet", nome:"Internet",                             grupo:"Serviços do Lar",   venc:10,   resp:"Casa" },
 ];
 /* valores por conta, na ordem de MESES (set..mai). 0 = a conta não existe naquele mês. */
 const VALORES = {
@@ -353,7 +374,7 @@ const CICLOS = [
     regras:["ritmo semanal: mais peso de seg a sex","checkpoints 25→20% · 50→50% · 75→75% · 90→90%","monitorar terças e quintas"],
     checkpoints:true,
     lanc:[
-      { data:"2026-08-26", desc:"Shopee (1ª de 2 parcelas)", quem:"Tales", valor:88.44,  cat:"Compras" },
+      { data:"2026-08-26", desc:"Shopee", quem:"Tales", valor:88.44, parc:{n:1,de:2,total:176.88},  cat:"Compras" },
       { data:"2026-08-26", desc:"Mercado Livre",             quem:"Tales", valor:168.18, cat:"Compras" },
       { data:"2026-08-26", desc:"iFood",    quem:"Nicolle", valor:23.08,  cat:"Alimentação" },
       { data:"2026-08-26", desc:"Manicure", quem:"Nicolle", valor:255.00, cat:"Cuidados" },
@@ -361,12 +382,12 @@ const CICLOS = [
       { data:"2026-08-27", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:39.61, cat:"Mercado" },
       { data:"2026-08-27", desc:"Bacio di Latte",            quem:"Tales",   valor:40.85,  cat:"Alimentação" },
       { data:"2026-08-27", desc:"Torino Comércio de Ali.",   quem:"Tales",   valor:437.31, cat:"Alimentação" },
-      { data:"2026-08-27", desc:"Zara Vila Lobos (1ª de 3 parcelas)", quem:"Tales", valor:96.18, cat:"Compras" },
+      { data:"2026-08-27", desc:"Zara Vila Lobos", quem:"Tales", valor:96.18, parc:{n:1,de:3,total:288.54}, cat:"Compras" },
       { data:"2026-08-27", desc:"Clube Livelo",              quem:"Tales",   valor:129.90, cat:"Assinaturas" },
       { data:"2026-08-28", desc:"Shopee *newcool",           quem:"Nicolle", valor:63.60,  cat:"Compras" },
-      { data:"2026-08-28", desc:"Shopee *superxx (1ª de 6 parcelas)", quem:"Nicolle", valor:63.63, cat:"Compras" },
+      { data:"2026-08-28", desc:"Shopee *superxx", quem:"Nicolle", valor:63.63, parc:{n:1,de:6,total:381.78}, cat:"Compras" },
       { data:"2026-08-28", desc:"iFood — WMS Supermercados", quem:"Nicolle", valor:62.76,  cat:"Mercado" },
-      { data:"2026-08-28", desc:"Onix Produtos (1ª de 6 parcelas)", quem:"Nicolle", valor:364.67, cat:"Trabalho" },
+      { data:"2026-08-28", desc:"Onix Produtos", quem:"Nicolle", valor:364.67, parc:{n:1,de:6,total:2188.00}, cat:"Trabalho" },
       { data:"2026-08-29", desc:"Padaria e restaurante",     quem:"Tales",   valor:71.12,  cat:"Alimentação" },
       { data:"2026-08-29", desc:"Espetinhos (almoço)",       quem:"Tales",   valor:196.00, cat:"Alimentação" },
       { data:"2026-08-29", desc:"Oba Hortifruti Leopoldina", quem:"Tales",   valor:113.97, cat:"Mercado" },
@@ -381,16 +402,16 @@ const CICLOS = [
       { data:"2026-08-30", desc:"Feira — santafruta",        quem:"Tales",   valor:12.00,  cat:"Mercado" },
       { data:"2026-08-30", desc:"Feira — italoalunni",       quem:"Tales",   valor:75.00,  cat:"Mercado" },
       { data:"2026-08-30", desc:"Sam's Club",                quem:"Tales",   valor:379.82, cat:"Mercado" },
-      { data:"2026-08-30", desc:"Vindi *yogibaby (1ª de 3 parcelas)", quem:"Nicolle", valor:107.51, cat:"Compras" },
+      { data:"2026-08-30", desc:"Vindi *yogibaby", quem:"Nicolle", valor:107.51, parc:{n:1,de:3,total:322.53}, cat:"Compras" },
       { data:"2026-08-31", desc:"Lâmpadas — sala da Nicolle", quem:"Tales", valor:67.90, cat:"Trabalho" },
       { data:"2026-08-31", desc:"99food",                     quem:"Tales", valor:92.72, cat:"Alimentação" },
       { data:"2026-09-01", desc:"Barbearia Piox",             quem:"Tales", valor:65.00,  cat:"Cuidados" },
       { data:"2026-09-01", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:129.70, cat:"Mercado" },
-      { data:"2026-09-01", desc:"Drogasil (1ª de 3 parcelas)",quem:"Tales", valor:113.40, cat:"Saúde" },
+      { data:"2026-09-01", desc:"Drogasil",quem:"Tales", valor:113.40, parc:{n:1,de:3,total:340.21}, cat:"Saúde" },
       { data:"2026-09-01", desc:"Arruda estacionamento",      quem:"Tales", valor:25.00,  cat:"Transporte" },
       { data:"2026-09-02", desc:"Pet Supermarket",            quem:"Nicolle", valor:61.52, cat:"Pet" },
       { data:"2026-09-02", desc:"GH Fernandes Comercial",     quem:"Tales", valor:9.50,   cat:"Alimentação" },
-      { data:"2026-09-03", desc:"Fikbella Perfumaria (1ª de 6 parcelas)", quem:"Tales", valor:45.16, cat:"Cuidados" },
+      { data:"2026-09-03", desc:"Fikbella Perfumaria", quem:"Tales", valor:45.16, parc:{n:1,de:6,total:270.98}, cat:"Cuidados" },
       { data:"2026-09-03", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:28.67,  cat:"Mercado" },
       { data:"2026-09-04", desc:"Oba Hortifruti",             quem:"Tales", valor:138.98, cat:"Mercado" },
       { data:"2026-09-04", desc:"iFood — NP Farma",           quem:"Nicolle", valor:107.94, cat:"Saúde" },
@@ -401,7 +422,7 @@ const CICLOS = [
       { data:"2026-09-04", desc:"99app",                      quem:"Nicolle", valor:5.00, cat:"Transporte" },
       /* 04/09: "uber uber * pending R$ 15,94" aparece riscado no extrato = estornado. Não lançado. */
       { data:"2026-09-05", desc:"99food",                     quem:"Tales", valor:211.19, cat:"Alimentação" },
-      { data:"2026-09-05", desc:"Vila dos Smurfs Park (1ª de 6 parcelas)", quem:"Tales", valor:67.03, cat:"Lazer" },
+      { data:"2026-09-05", desc:"Vila dos Smurfs Park", quem:"Tales", valor:67.03, parc:{n:1,de:6,total:402.16}, cat:"Lazer" },
       { data:"2026-09-05", desc:"Allpark estacionamento",     quem:"Tales", valor:60.00,  cat:"Transporte" },
       { data:"2026-09-06", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:32.16,  cat:"Mercado" },
       { data:"2026-09-06", desc:"99food",                     quem:"Tales", valor:92.17,  cat:"Alimentação" },
@@ -423,19 +444,19 @@ const CICLOS = [
       { data:"2026-09-10", desc:"Apolônio Park estacionamento", quem:"Tales", valor:40.00, cat:"Transporte" },
       { data:"2026-09-11", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:183.44, cat:"Mercado" },
       { data:"2026-09-11", desc:"Shopee *mgcortes",           quem:"Nicolle", valor:85.48, cat:"Compras" },
-      { data:"2026-09-11", desc:"Shopee *vsartesanal (1ª de 2 parcelas)", quem:"Nicolle", valor:86.40, cat:"Compras" },
+      { data:"2026-09-11", desc:"Shopee *vsartesanal", quem:"Nicolle", valor:86.40, parc:{n:1,de:2,total:172.79}, cat:"Compras" },
       { data:"2026-09-11", desc:"Shopee *neoespcolchoes",     quem:"Nicolle", valor:72.60, cat:"Casa" },
-      { data:"2026-09-11", desc:"H&M Brasil (1ª de 6 parcelas)", quem:"Nicolle", valor:58.28, cat:"Compras" },
-      { data:"2026-09-11", desc:"Renner (1ª de 2 parcelas)",  quem:"Nicolle", valor:47.95, cat:"Compras" },
+      { data:"2026-09-11", desc:"H&M Brasil", quem:"Nicolle", valor:58.28, parc:{n:1,de:6,total:349.70}, cat:"Compras" },
+      { data:"2026-09-11", desc:"Renner",  quem:"Nicolle", valor:47.95, parc:{n:1,de:2,total:95.89}, cat:"Compras" },
       { data:"2026-09-12", desc:"iFood — Djapa Moema",        quem:"Tales", valor:489.85, cat:"Alimentação" },
       { data:"2026-09-12", desc:"Keeta — bar e restaurante",  quem:"Tales", valor:112.09, cat:"Alimentação" },
       { data:"2026-09-12", desc:"Padaria e restaurante",      quem:"Tales", valor:87.94,  cat:"Alimentação" },
       { data:"2026-09-12", desc:"Amazon BR",                  quem:"Nicolle", valor:85.49, cat:"Compras" },
-      { data:"2026-09-12", desc:"Shopee *adkids (1ª de 3 parcelas)", quem:"Nicolle", valor:65.82, cat:"Compras" },
+      { data:"2026-09-12", desc:"Shopee *adkids", quem:"Nicolle", valor:65.82, parc:{n:1,de:3,total:197.47}, cat:"Compras" },
       { data:"2026-09-12", desc:"Kick Park estacionamento",   quem:"Tales", valor:35.00,  cat:"Transporte" },
       { data:"2026-09-12", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:31.13,  cat:"Mercado" },
       { data:"2026-09-12", desc:"Amazon Prime Canais",        quem:"Nicolle", valor:29.90, cat:"Assinaturas" },
-      { data:"2026-09-13", desc:"Ticketmaster (1ª de 3 parcelas)", quem:"Tales", valor:114.00, cat:"Lazer" },
+      { data:"2026-09-13", desc:"Ticketmaster", quem:"Tales", valor:114.00, parc:{n:1,de:3,total:342.00}, cat:"Lazer" },
       { data:"2026-09-13", desc:"Feira — milton de l silva",  quem:"Tales", valor:65.00,  cat:"Mercado" },
       { data:"2026-09-13", desc:"Feira — naturarte",          quem:"Tales", valor:40.00,  cat:"Mercado" },
       { data:"2026-09-13", desc:"Feira — mp *varejo",         quem:"Tales", valor:20.00,  cat:"Mercado" },
@@ -444,9 +465,9 @@ const CICLOS = [
       { data:"2026-09-13", desc:"Feira — eduardoissamuueda",  quem:"Tales", valor:10.00,  cat:"Mercado" },
       { data:"2026-09-13", desc:"Feira — eduardo tagashira",  quem:"Tales", valor:5.00,   cat:"Mercado" },
       { data:"2026-09-13", desc:"Shazam Soluções",            quem:"Tales", valor:88.00,  cat:"Compras" },
-      { data:"2026-09-13", desc:"Zara Vila Lobos (1ª de 3 parcelas)", quem:"Tales", valor:78.00, cat:"Compras" },
+      { data:"2026-09-13", desc:"Zara Vila Lobos", quem:"Tales", valor:78.00, parc:{n:1,de:3,total:234.00}, cat:"Compras" },
       { data:"2026-09-13", desc:"Daiso Brasil",               quem:"Tales", valor:40.96,  cat:"Compras" },
-      { data:"2026-09-13", desc:"Ri Happy Brinquedos (1ª de 5 parcelas)", quem:"Tales", valor:32.38, cat:"Compras" },
+      { data:"2026-09-13", desc:"Ri Happy Brinquedos", quem:"Tales", valor:32.38, parc:{n:1,de:5,total:161.89}, cat:"Compras" },
       { data:"2026-09-14", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:424.65, cat:"Mercado" },
       { data:"2026-09-14", desc:"99food",                     quem:"Tales", valor:111.63, cat:"Alimentação" },
       { data:"2026-09-14", desc:"Mercado Livre *shopligh",    quem:"Tales", valor:38.97,  cat:"Compras" },
@@ -470,6 +491,16 @@ const CICLOS = [
       /* 17/09: Uber 18,03 tem o mesmo valor do de 14/09 — possível re-datação de "pending". A confirmar.
          O outro Uber pending (10,39) aparece riscado = estorno, não foi lançado. */
       { data:"2026-09-17", desc:"Uber",                       quem:"Tales", valor:18.03,  cat:"Transporte" },
+    ]
+  },
+  {
+    /* LIMITE A CONFIRMAR com o Tales antes de 25/09 — por enquanto repete setembro */
+    id:"out", label:"Outubro", inicio:"2026-09-25", fim:"2026-10-24",
+    orcamento:13500, wUtil:5, wFds:4, limiteConfirmado:false,
+    regras:["ritmo semanal: mais peso de seg a sex","checkpoints 25→20% · 50→50% · 75→75% · 90→90%","monitorar terças e quintas"],
+    checkpoints:true,
+    lanc:[
+      /* as parcelas 2/N das compras de setembro entram aqui automaticamente (ver parcelasHerdadas) */
     ]
   }
 ];
@@ -509,6 +540,51 @@ function cotas(c){
   return { DIAS, qUtil:c.orcamento*c.wUtil/soma, qFds:c.orcamento*c.wFds/soma,
            frac:s=>peso(c,s)/soma };
 }
+/* ---------- parcelas ----------
+   Um lançamento com parc:{n,de,total} é a parcela n de "de". As parcelas seguintes
+   NÃO são digitadas: cada ciclo posterior recebe automaticamente a sua (parcelasHerdadas).
+   A última parcela leva a diferença de centavos para a soma bater com o total. */
+function valorParcela(parc,k){
+  const base=Math.round(parc.total/parc.de*100)/100;
+  if(k<parc.de) return base;
+  return Math.round((parc.total-base*(parc.de-1))*100)/100;
+}
+function somaMeses(isoStr,m){
+  const dt=d(isoStr); const dia=dt.getDate();
+  const alvo=new Date(dt.getFullYear(),dt.getMonth()+m,1);
+  const ultimo=new Date(alvo.getFullYear(),alvo.getMonth()+1,0).getDate();
+  alvo.setDate(Math.min(dia,ultimo)); return iso(alvo);
+}
+function parcelasHerdadas(c){
+  const ci=CICLOS.findIndex(x=>x.id===c.id); const out=[];
+  for(let cj=0;cj<ci;cj++){
+    const k=ci-cj+1;                        /* parcela que cai neste ciclo */
+    for(const l of CICLOS[cj].lanc){
+      if(!l.parc||k>l.parc.de) continue;
+      out.push({...l, data:somaMeses(l.data,k-1), valor:valorParcela(l.parc,k),
+                parc:{...l.parc,n:k}, herdada:true});
+    }
+  }
+  return out;
+}
+function lancDoCiclo(c){
+  return c.lanc.map(l=>({...l}))
+    .concat(parcelasHerdadas(c))
+    .concat(locais().filter(l=>l.data>=c.inicio&&l.data<=c.fim));
+}
+/* quanto do PRÓXIMO ciclo já está comprometido por parcelas dos ciclos anteriores */
+function comprometidoProximo(c){
+  const ci=CICLOS.findIndex(x=>x.id===c.id);
+  const prox=CICLOS[ci+1];
+  const fake = prox || { id:'__prox', lanc:[] };
+  if(!prox) CICLOS.push(fake);
+  const lista=parcelasHerdadas(fake);
+  if(!prox) CICLOS.pop();
+  return { total:lista.reduce((s,l)=>s+l.valor,0), n:lista.length, lista };
+}
+function descDe(l){ return l.parc ? `${l.desc} <span class="parcchip${l.herdada?' auto':''}">${l.parc.n}ª de ${l.parc.de}</span>` : l.desc; }
+function descTexto(l){ return l.parc ? `${l.desc} (${l.parc.n}ª de ${l.parc.de})` : l.desc; }
+
 function locais(){ try{ return JSON.parse(localStorage.getItem(KEY_LOCAL)||'[]') }catch(e){ return [] } }
 function salvarLocais(a){ try{ localStorage.setItem(KEY_LOCAL,JSON.stringify(a)) }catch(e){} }
 
@@ -584,7 +660,7 @@ document.getElementById('fAdd').onclick=()=>{
 document.getElementById('copiar').onclick=()=>{
   const a=locais();
   if(!a.length){ alert('Não há lançamentos feitos neste aparelho para copiar.'); return; }
-  const txt=a.map(l=>`${fmtD(l.data)} — ${l.desc} — ${l.quem} — R$ ${l.valor.toFixed(2).replace('.',',')}`).join('\n');
+  const txt=a.map(l=>`${fmtD(l.data)} — ${descTexto(l)} — ${l.quem} — R$ ${l.valor.toFixed(2).replace('.',',')}`).join('\n');
   const ok=()=>alert('Copiado! Cole na conversa com o Claude para virar oficial.');
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok,()=>prompt('Copie:',txt));
   else prompt('Copie:',txt);
@@ -602,6 +678,7 @@ function renderTabs(){
     `<button class="tab${ativo==='pag'?' on':''}" data-t="pag">Mensal</button>`+
     `<button class="tab${ativo==='ger'?' on':''}" data-t="ger">Geral</button>`;
   document.querySelectorAll('#tabs .tab').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+  const on=document.querySelector('#tabs .tab.on'); if(on&&on.scrollIntoView) on.scrollIntoView({inline:'nearest',block:'nearest'});
 }
 function render(){
   renderTabs();
@@ -617,8 +694,7 @@ function render(){
   const iHoje = Math.min(Math.max(difDias(c.inicio,HOJE),0),n-1);
   const encerrado = HOJE>c.fim, futuroCiclo = HOJE<c.inicio;
 
-  const TODOS = c.lanc.map(l=>({...l}))
-    .concat(locais().filter(l=>l.data>=c.inicio&&l.data<=c.fim));
+  const TODOS = lancDoCiclo(c);
   const porDiaMap={}; TODOS.forEach(l=>{porDiaMap[l.data]=(porDiaMap[l.data]||0)+l.valor});
   const gasto=TODOS.reduce((s,l)=>s+l.valor,0), restante=c.orcamento-gasto;
   const gHoje=dentro?(porDiaMap[HOJE]||0):0;
@@ -648,14 +724,25 @@ function render(){
     (dentro?` · dia ${iHoje+1} de ${n} · ${n-iHoje} dia(s) restante(s)`
            :encerrado?` · ciclo encerrado`:` · começa em ${fmtD(c.inicio)}`);
   const semana=5*qUtil+2*qFds;
+  const k=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
   document.getElementById('regras').innerHTML =
-    `<span class="rule">Orçamento ${brl(c.orcamento)}</span>`+
-    `<span class="rule">${brl(qUtil)}/dia útil (${nU}) · ${brl(qFds)}/sáb-dom (${nF})</span>`+
-    (c.id==='set'?`<span class="rule">≈ ${brl(semana)}/semana</span>`:'')+
-    (c.checkpoints?`<span class="rule">checkpoints 25→20% · 50→50% · 75→75% · 90→90%</span>`:'');
+    `Orçamento <b>${brl(c.orcamento)}</b>`+
+    (c.limiteConfirmado===false?`<span class="aviso">limite a confirmar</span>`:'')+
+    ` <span class="sep">·</span> <span style="white-space:nowrap"><b>${k(qUtil)}</b>/dia útil</span> <span class="sep">·</span> <span style="white-space:nowrap"><b>${k(qFds)}</b>/sáb-dom</span>`+
+    (c.checkpoints?` <span class="sep">·</span> <span style="white-space:nowrap">≈ <b>${k(semana)}</b>/semana</span>`:'')+
+    (c.checkpoints?`<br>checkpoints 25→20% · 50→50% · 75→75% · 90→90%`:'');
+
+  /* duas projeções: ritmo médio do ciclo (suave) e ritmo dos últimos 7 dias (reage rápido).
+     A cor do status usa a PIOR das duas — a média longa esconde aceleração. */
+  const projMes=esperado>0?c.orcamento*(gasto/esperado):gasto;
+  const diasPassados=dentro?DIAS.slice(Math.max(0,iHoje-6),iHoje+1):[];   /* hoje + 6 anteriores */
+  const gasto7=diasPassados.reduce((s,x)=>s+(porDiaMap[x]||0),0);
+  const media7=diasPassados.length?gasto7/diasPassados.length:0;
+  const diasFuturos=dentro?(n-1-iHoje):0;
+  const projSem=dentro&&iHoje>=6?gasto+media7*diasFuturos:projMes;
+  const projecao=encerrado?gasto:Math.max(projMes,projSem);
 
   /* status + cor */
-  const projecao=esperado>0?c.orcamento*(gasto/esperado):gasto;
   let cor='var(--ok)', rot='Dentro do plano', txt=`${brl(esperado-gasto)} abaixo do previsto até hoje`;
   if(encerrado){ rot='Ciclo encerrado';
     txt = gasto>c.orcamento ? `fechou ${brl(gasto-c.orcamento)} acima do orçamento`
@@ -674,8 +761,14 @@ function render(){
     chkHtml=`<div class="chk">Checkpoint: <b>${pctTempo.toFixed(0)}%</b> do ciclo → orçamento deveria estar em até <b>${perm.toFixed(0)}%</b> · está em <b style="color:${okc?'var(--ok)':'var(--bad)'}">${pctGasto.toFixed(0)}%</b></div>`;
   }
 
-  /* terças e quintas (setembro) */
-  const terQui=TODOS.filter(l=>[2,4].includes(d(l.data).getDay())).reduce((s,l)=>s+l.valor,0);
+  /* terças e quintas: média por dia comparada com os outros dias já passados */
+  const passados=DIAS.slice(0,encerrado?n:(dentro?iHoje+1:0));
+  const tq=passados.filter(x=>[2,4].includes(d(x).getDay())), outros=passados.filter(x=>![2,4].includes(d(x).getDay()));
+  const mediaDe=arr=>arr.length?arr.reduce((s,x)=>s+(porDiaMap[x]||0),0)/arr.length:0;
+  const mTQ=mediaDe(tq), mOut=mediaDe(outros);
+
+  /* parcelas já comprometidas para o próximo ciclo */
+  const comp=comprometidoProximo(c);
 
   /* cards */
   let cards=`
@@ -735,18 +828,36 @@ function render(){
       <div class="note">${fdsDatas.length?`${fdsDatas.length} dia(s) · ${fdsDatas.slice(0,4).map(fmtD).join(', ')}${fdsDatas.length>4?'…':''}`:'não há mais fim de semana neste ciclo'}</div>
     </div>`;
   }
-  cards+=`
-    <div class="card">
-      <div class="lbl">Projeção do ciclo</div>
-      <div class="val" style="color:${projecao>c.orcamento?'var(--bad)':'var(--ok)'}">${brl(projecao)}</div>
-      <div class="note">${projecao>c.orcamento?`${brl(projecao-c.orcamento)} acima do orçamento`:`${brl(c.orcamento-projecao)} de folga`}</div>
+  if(dentro){
+    const corP=v=>v>c.orcamento?'var(--bad)':'var(--ok)';
+    cards+=`
+    <div class="card big">
+      <div class="lbl">Projeção de fechamento</div>
+      <div class="val" style="color:${corP(projecao)}">${brl(projecao)}</div>
+      <div class="note">${projecao>c.orcamento?`${brl(projecao-c.orcamento)} acima do orçamento`:`${brl(c.orcamento-projecao)} de folga`}
+        — o status acima usa a pior das duas leituras</div>
+      <div class="proj2">
+        <div><div class="k">ritmo do mês</div><div class="v" style="color:${corP(projMes)}">${brl(projMes)}</div></div>
+        <div><div class="k">ritmo da última semana</div><div class="v" style="color:${corP(projSem)}">${dentro&&iHoje>=6?brl(projSem):'—'}</div>
+          <div class="note" style="margin-top:2px">${dentro&&iHoje>=6?`média ${brl(media7)}/dia`:'a partir do 7º dia'}</div></div>
+      </div>
     </div>`;
-  if(c.id==='set'){
+  }
+  if(comp.n){
+    cards+=`
+    <div class="card">
+      <div class="lbl">Parcelas já no próximo ciclo</div>
+      <div class="val" style="color:var(--warn)">${brl(comp.total)}</div>
+      <div class="note">${comp.n} compra(s) parcelada(s) — entram sozinhas no ciclo seguinte antes de qualquer gasto novo</div>
+    </div>`;
+  }
+  if(c.checkpoints && tq.length && outros.length){
+    const dif=mOut>0?(mTQ/mOut-1)*100:0;
     cards+=`
     <div class="card">
       <div class="lbl">Terças &amp; quintas</div>
-      <div class="val">${brl(terQui)}</div>
-      <div class="note">dias a monitorar — historicamente os mais caros da sua fatura</div>
+      <div class="val" style="color:${dif>15?'var(--warn)':'inherit'}">${brl(mTQ)}<span style="font-size:13px;font-weight:500;color:var(--muted)">/dia</span></div>
+      <div class="note">vs ${brl(mOut)}/dia nos outros dias · <b style="color:${dif>15?'var(--warn)':'var(--ok)'}">${dif>=0?'+':''}${dif.toFixed(0)}%</b> · ${tq.length} dia(s) medidos</div>
     </div>`;
   }
   document.getElementById('cards').innerHTML=cards;
@@ -763,7 +874,7 @@ function render(){
 
 /* ---------- gráfico ---------- */
 function desenharGrafico(c,DIAS,frac,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto){
-  const W=760,H=240,ML=60,MR=16,MT=16,MB=34, iw=W-ML-MR, ih=H-MT-MB;
+  const W=760,H=250,ML=64,MR=16,MT=20,MB=40, iw=W-ML-MR, ih=H-MT-MB;
   const n=DIAS.length;
   const x=i=>ML+(n<=1?iw/2:i/(n-1)*iw);
   const maxY=Math.max(c.orcamento,gasto)*1.05;
@@ -778,7 +889,7 @@ function desenharGrafico(c,DIAS,frac,plano,porDiaMap,iHoje,dentro,encerrado,cor,
     g+=`<rect x="${x0}" y="${MT}" width="${Math.min(meio,W-MR-x0)}" height="${ih}" fill="var(--band)"/>`;});
   [0,.25,.5,.75,1].forEach(f=>{ const v=maxY*f;
     g+=`<line x1="${ML}" y1="${y(v)}" x2="${W-MR}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`+
-       `<text x="${ML-9}" y="${y(v)+4}" text-anchor="end" font-size="10.5" fill="var(--muted)">${(v/1000).toFixed(1).replace('.',',')}k</text>`;});
+       `<text x="${ML-9}" y="${y(v)+5}" text-anchor="end" font-size="14" fill="var(--muted)">${(v/1000).toFixed(1).replace('.',',')}k</text>`;});
   g+=`<polyline points="${plano.map((v,i)=>`${x(i)},${y(v)}`).join(' ')}" fill="none"
         stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round" opacity=".85"/>`;
   if(real.length){
@@ -789,12 +900,16 @@ function desenharGrafico(c,DIAS,frac,plano,porDiaMap,iHoje,dentro,encerrado,cor,
       g+=`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${cor}" stroke="var(--panel)" stroke-width="2"/>`;});
   }
   const rotDia=['dom','seg','ter','qua','qui','sex','sáb'];
-  const passoRot=n>12?2:1;
+  const passoRot=n>20?3:n>12?2:1;
   DIAS.forEach((dt,i)=>{
     if(i%passoRot!==0&&i!==n-1) return;
     const dd=d(dt);
-    g+=`<text x="${x(i)}" y="${H-16}" text-anchor="middle" font-size="10" fill="var(--muted)">${String(dd.getDate()).padStart(2,'0')}</text>`+
-       `<text x="${x(i)}" y="${H-4}" text-anchor="middle" font-size="8.5" fill="var(--muted)" opacity=".8">${rotDia[dd.getDay()]}</text>`;});
+    g+=`<text x="${x(i)}" y="${H-17}" text-anchor="middle" font-size="13" fill="var(--muted)">${String(dd.getDate()).padStart(2,'0')}</text>`+
+       `<text x="${x(i)}" y="${H-3}" text-anchor="middle" font-size="11" fill="var(--muted)" opacity=".8">${rotDia[dd.getDay()]}</text>`;});
+  if(dentro){
+    g+=`<line x1="${x(iHoje)}" y1="${MT}" x2="${x(iHoje)}" y2="${MT+ih}" stroke="${cor}" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>`+
+       `<text x="${x(iHoje)}" y="${MT-4}" text-anchor="middle" font-size="12" font-weight="600" fill="${cor}">hoje</text>`;
+  }
   g+=`<line id="cross" x1="0" y1="${MT}" x2="0" y2="${MT+ih}" stroke="var(--muted)" stroke-width="1" opacity="0"/>`;
   DIAS.forEach((dt,i)=>{ const meio=(n<=1?iw:iw/(n-1));
     g+=`<rect class="hit" data-i="${i}" x="${x(i)-meio/2}" y="${MT}" width="${meio}" height="${ih}" fill="transparent"/>`;});
@@ -811,7 +926,7 @@ function desenharGrafico(c,DIAS,frac,plano,porDiaMap,iHoje,dentro,encerrado,cor,
       `<b>${d(dt).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'})}</b>`+
       `${ehFds(dt)?' · fim de semana':''}<br>`+
       (fut?`<span style="color:var(--muted)">ainda não chegou</span><br>`
-          :`gasto no dia: ${brl(porDiaMap[dt]||0)}<br>acumulado: <b>${brl(real[i]||0)}</b><br>`)+
+          :`gasto no dia: ${brl(porDiaMap[dt]||0)} <span style="color:var(--muted)">(cota ${brl(c.orcamento*frac(dt))})</span><br>acumulado: <b>${brl(real[i]||0)}</b><br>`)+
       `plano acumulado: ${brl(plano[i])}`;
     const r=svg.getBoundingClientRect(), px=(x(i)/W)*r.width;
     tip.style.opacity='1';
@@ -844,23 +959,32 @@ function desenharCategorias(c,TODOS,gasto){
 }
 
 /* ---------- tabela ---------- */
+let tabelaCompleta=false;   /* mostra só os últimos 7 dias por padrão — a lista chega a 130+ linhas */
 function desenharTabela(c,TODOS,frac){
   const el=document.getElementById('tabela');
   if(!TODOS.length){ el.innerHTML='<div class="empty">Nenhum gasto lançado neste ciclo ainda.</div>'; return; }
   const porData={}; TODOS.forEach(l=>{(porData[l.data]=porData[l.data]||[]).push(l)});
+  const datas=Object.keys(porData).sort().reverse();
+  const visiveis=tabelaCompleta?datas:datas.slice(0,7);
+  const ocultos=datas.length-visiveis.length;
   let h='<div class="card" style="padding:6px 4px"><table><thead><tr><th>Descrição</th><th class="num">Valor</th></tr></thead><tbody>';
-  Object.keys(porData).sort().reverse().forEach(dt=>{
-    const tot=porData[dt].reduce((s,l)=>s+l.valor,0);
-    h+=`<tr class="day"><td>${d(dt).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}`+
-       `${ehFds(dt)?'<span class="fds">fim de semana</span>':''}</td>`+
-       `<td class="num">${brl(tot)} <span style="color:var(--muted);font-weight:400">/ ${brl(c.orcamento*frac(dt))}</span></td></tr>`;
+  visiveis.forEach(dt=>{
+    const tot=porData[dt].reduce((s,l)=>s+l.valor,0), cota=c.orcamento*frac(dt);
+    const kk=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
+    h+=`<tr class="day"><td colspan="2"><div class="dayrow"><span>${d(dt).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}`+
+       `${ehFds(dt)?'<span class="fds">fim de semana</span>':''}</span>`+
+       `<span class="num">${brl(tot)}<span class="cota${tot>cota?' estourou':''}">${tot>cota?`${kk(tot-cota)} acima da cota de ${kk(cota)}`:`cota ${kk(cota)}`}</span></span></div></td></tr>`;
     porData[dt].forEach(l=>{
       const li=l.local?locais().findIndex(z=>z.data===l.data&&z.desc===l.desc&&z.valor===l.valor&&z.quem===l.quem):-1;
-      h+=`<tr><td>${l.desc}<span class="who">${l.quem}</span>${l.cat?`<span class="catchip">${l.cat}</span>`:''}${l.local?'<span class="tag-local">neste aparelho</span>':''}</td>`+
+      h+=`<tr><td>${descDe(l)}<span class="who">${l.quem}</span>${l.cat?`<span class="catchip">${l.cat}</span>`:''}${l.local?'<span class="tag-local">neste aparelho</span>':''}</td>`+
          `<td class="num">${brl(l.valor)}${li>=0?` <button class="del" data-i="${li}" title="remover">×</button>`:''}</td></tr>`;
     });
   });
-  el.innerHTML=h+'</tbody></table></div>';
+  h+='</tbody></table></div>';
+  if(ocultos>0) h+=`<button class="vermais" id="verMais">ver o ciclo inteiro (+${ocultos} dia(s), ${TODOS.length} lançamentos)</button>`;
+  else if(tabelaCompleta&&datas.length>7) h+=`<button class="vermais" id="verMais">mostrar só os últimos 7 dias</button>`;
+  el.innerHTML=h;
+  const vm=document.getElementById('verMais'); if(vm) vm.onclick=()=>{ tabelaCompleta=!tabelaCompleta; render(); };
   el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
     const a=locais(); a.splice(+b.dataset.i,1); salvarLocais(a); render(); });
 }
@@ -914,7 +1038,10 @@ function contasDoMes(mid){
     let situacao='normal', dias=null;
     if(dv && !pago){
       dias=difDias(hoje,dv);
-      if(dias<0) situacao='atrasada';
+      /* passou do vencimento sem marcação → "confirmar" (âmbar). Só vira "atrasada" (vermelho)
+         quando o Claude registra OFICIAL[chave].atrasada = true — o status de pago fica no
+         aparelho, então "não marcada" quase nunca significa "não paga". */
+      if(dias<0) situacao=(OFICIAL[mid+':'+cdef.id]||{}).atrasada?'atrasada':'confirmar';
       else if(dias<=3) situacao='vence-logo';
     }
     return {...cdef, valor:(VALORES[cdef.id]||[])[i]||0, dv, pago, situacao, dias};
@@ -942,15 +1069,17 @@ function renderPagamentos(){
   document.querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{ mesSel=b.dataset.m; renderPagamentos(); });
 
   const [my,mm]=mes.id.split('-').map(Number);
-  document.getElementById('sub').textContent =
-    `Contas de ${mes.label} · fatura ${fmtD(iso(new Date(my,mm-2,26)))} → ${fmtD(iso(new Date(my,mm-1,25)))} · ${lista.length} contas`;
+  const nomeMes=new Date(my,mm-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  document.getElementById('sub').textContent = `Contas de ${nomeMes} · ${lista.length} contas`;
   document.getElementById('regras').innerHTML =
-    `<span class="rule">Total do mês ${brl(total)}</span>`+
-    `<span class="rule">renda prevista ${brl(mes.renda)} · sobra projetada ${brl(mes.renda-total)}</span>`;
+    `Total do mês <b>${brl(total)}</b> <span class="sep">·</span> renda <b>${brl(mes.renda)}</b>`+
+    ` <span class="sep">·</span> sobra <b style="color:${mes.renda-total<0?'var(--bad)':'var(--ok)'}">${brl(mes.renda-total)}</b>`;
 
   const atrasadas=lista.filter(p=>p.situacao==='atrasada');
+  const confirmar=lista.filter(p=>p.situacao==='confirmar');
   const proximas=lista.filter(p=>!p.pago&&p.dv&&p.dias>=0).sort((a,b)=>a.dias-b.dias);
   const prox=proximas[0];
+  const sete=proximas.filter(p=>p.dias<=7);
   const semData=lista.filter(p=>!p.pago&&!p.dv);
 
   document.getElementById('pagResumo').innerHTML = `
@@ -960,22 +1089,23 @@ function renderPagamentos(){
     <div class="barwrap"><div class="barfill"><div class="bar" style="width:${pct}%;background:var(--ok)"></div></div></div>
     <div class="legend"><span>${pagos.length} de ${lista.length} contas pagas (${pct.toFixed(0)}%)</span>
       <span>falta ${brl(total-vPago)}</span></div>
-    ${atrasadas.length?`<div class="chk" style="color:var(--bad)"><b>${atrasadas.length} conta(s) vencida(s)</b> — ${brl(atrasadas.reduce((s,p)=>s+p.valor,0))}: ${atrasadas.map(p=>p.nome.split(' ')[0]).join(', ')}</div>`:''}
+    ${atrasadas.length?`<div class="chk" style="color:var(--bad)"><b>${atrasadas.length} conta(s) em atraso</b> — ${brl(atrasadas.reduce((s,p)=>s+p.valor,0))}: ${atrasadas.map(p=>p.curto).join(', ')}</div>`:''}
+    ${confirmar.length?`<div class="chk" style="color:var(--warn)"><b>${confirmar.length} conta(s) passaram do vencimento sem marcação</b> — ${brl(confirmar.reduce((s,p)=>s+p.valor,0))}: ${confirmar.map(p=>p.curto).join(', ')}. Se pagou, marque; se não, avise o Claude.</div>`:''}
   </div>
   <div class="card">
     <div class="lbl">Próximo vencimento</div>
     <div class="val" style="font-size:20px;line-height:1.3">${prox?`${fmtD(prox.dv)}`:'—'}</div>
-    <div class="note">${prox?`${prox.nome} · ${brl(prox.valor)}<br>${prox.dias===0?'<b>é hoje</b>':prox.dias===1?'amanhã':`em ${prox.dias} dias`}`:'nada a vencer'}</div>
+    <div class="note">${prox?`${prox.curto} · ${brl(prox.valor)}<br>${prox.dias===0?'<b>é hoje</b>':prox.dias===1?'amanhã':`em ${prox.dias} dias`}`:'nada a vencer'}</div>
   </div>
   <div class="card">
-    <div class="lbl">A pagar até o dia 10</div>
-    <div class="val">${brl(proximas.filter(p=>p.venc<=10).reduce((s,p)=>s+p.valor,0))}</div>
-    <div class="note">${proximas.filter(p=>p.venc<=10).length} conta(s) com data marcada</div>
+    <div class="lbl">Vence nos próximos 7 dias</div>
+    <div class="val">${brl(sete.reduce((s,p)=>s+p.valor,0))}</div>
+    <div class="note">${sete.length?sete.map(p=>`${p.curto} ${fmtD(p.dv)}`).join(' · '):'nada com data nesta semana'}</div>
   </div>
   <div class="card">
     <div class="lbl">Sem data definida</div>
     <div class="val">${brl(semData.reduce((s,p)=>s+p.valor,0))}</div>
-    <div class="note">${semData.length?semData.map(p=>p.nome.split(' ')[0]).join(' · '):'nenhuma'}</div>
+    <div class="note">${semData.length?semData.map(p=>p.curto).join(' · '):'nenhuma'}</div>
   </div>`;
 
   const el=document.getElementById('pagLista');
@@ -983,18 +1113,18 @@ function renderPagamentos(){
     const st=pagEstado(mesSel+':'+p.id);
     const venctxt = p.dv
       ? `vence ${fmtD(p.dv)}` + (st.pago?'' :
-          p.situacao==='atrasada' ? ` · <b style="color:var(--bad)">venceu há ${-p.dias} dia(s)</b>`
+          p.situacao==='atrasada' ? ` · <b style="color:var(--bad)">em atraso há ${-p.dias} dia(s)</b>`
+          : p.situacao==='confirmar' ? ` · <b style="color:var(--warn)">venceu há ${-p.dias} dia(s) — pagou?</b>`
           : p.dias===0 ? ' · <b style="color:var(--warn)">é hoje</b>'
           : p.dias<=3 ? ` · <b style="color:var(--warn)">em ${p.dias} dia(s)</b>`
           : ` · em ${p.dias} dias`)
       : (p.vencNota||'sem data');
-    const borda = st.pago ? '' :
-      p.situacao==='atrasada' ? 'style="border-color:var(--bad)"'
-      : p.situacao==='vence-logo' ? 'style="border-color:var(--warn)"' : '';
-    return `<div class="conta${st.pago?' paga':''}" ${borda} data-id="${mesSel}:${p.id}">
+    const cls = st.pago ? ' paga' : p.situacao==='atrasada' ? ' atrasada' : p.situacao==='confirmar' ? ' confirmar' : '';
+    const borda = (!st.pago && p.situacao==='vence-logo') ? 'style="border-color:var(--warn)"' : '';
+    return `<div class="conta${cls}" ${borda} data-id="${mesSel}:${p.id}">
       <div class="topo">
         <div>
-          <div class="nome">${st.pago?'✅ ':p.situacao==='atrasada'?'⚠️ ':''}${p.nome}</div>
+          <div class="nome">${st.pago?'✅ ':p.situacao==='atrasada'?'⚠️ ':p.situacao==='confirmar'?'❓ ':''}${p.nome}</div>
           <div class="meta"><span class="grpchip">${p.grupo}</span> <span class="respchip">${p.resp}</span>
             · ${venctxt}</div>
         </div>
@@ -1061,8 +1191,8 @@ function renderGeral(){
   document.getElementById('sub').textContent =
     `Visão geral · ${MESES[0].label} a ${MESES[MESES.length-1].label} · fonte: planilha "projeção mensal"`;
   document.getElementById('regras').innerHTML =
-    `<span class="rule">renda ${brl(MESES[0].renda)}/mês · ${brl(MESES[MESES.length-1].renda)} a partir de Jan/27</span>`+
-    `<span class="rule">contas caem ${brl(primeiro-ultimo)} até ${MESES[MESES.length-1].label}</span>`;
+    `renda <b>${brl(MESES[0].renda)}</b>/mês, <b>${brl(MESES[MESES.length-1].renda)}</b> a partir de Jan/27`+
+    ` <span class="sep">·</span> contas caem <b>${brl(primeiro-ultimo)}</b> até ${MESES[MESES.length-1].label}`;
 
   const rendas=[...new Set(MESES.map(m=>m.renda))];
   document.getElementById('gerLegRenda').textContent = rendas.length>1
