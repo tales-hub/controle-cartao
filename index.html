@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 51 de 20/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 52 de 25/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "20/09/2026";
-const VERSAO     = "51";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "25/09/2026";
+const VERSAO     = "52";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -310,7 +310,7 @@ const CONTAS_DEF = [
 /* valores por conta, na ordem de MESES (set..mai). 0 = a conta não existe naquele mês. */
 const VALORES = {
   "aluguel-apto":  [19700,19700,19700,19700,19700,19700,19700,19700,19700],
-  "cartao-itau":   [0,23900,4888,3464,2058,1553,848,529,224],
+  "cartao-itau":   [0,32250.72,4888,3464,2058,1553,848,529,224],   /* out/26: fatura fechada em 24/09 (app Itaú) — planilha dizia 23.900 */
   "cartao-nubank": [7240,7000,3678,3678,2378,2378,1715,1007,611],
   "escola-miguel": [5957,5957,5957,5957,5957,5957,5957,5957,5957],
   "sala-nicolle":  [3156.14,4000,4000,4000,3500,3500,3500,3500,3500],  /* set/26: valor real do boleto */
@@ -343,7 +343,9 @@ const OFICIAL = {
 
 const CICLOS = [
   {
-    id:"ago", label:"Agosto", inicio:"2026-08-19", fim:"2026-08-25",
+    /* rótulos seguem o app do Itaú: a fatura leva o nome do mês em que é PAGA.
+       Fatura Set = fecha 25/08 · Fatura Out = fecha 24/09 · Fatura Nov = fecha 24/10 */
+    id:"ago", label:"Set", inicio:"2026-08-19", fim:"2026-08-25",
     orcamento:2000, wUtil:1, wFds:2,       // 40% do orçamento nos 2 dias de fds
     regras:["40% do orçamento no fim de semana"],
     checkpoints:false,
@@ -369,7 +371,7 @@ const CICLOS = [
   },
   {
     /* fechamento da fatura confirmado pelo Tales: 24/09 (era 25/09 na estimativa inicial) */
-    id:"set", label:"Setembro", inicio:"2026-08-26", fim:"2026-09-24",
+    id:"set", label:"Out", inicio:"2026-08-26", fim:"2026-09-24",
     orcamento:13500, wUtil:5, wFds:4,      // proporção R$500 útil : R$400 fds da regra semanal
     regras:["ritmo semanal: mais peso de seg a sex","checkpoints 25→20% · 50→50% · 75→75% · 90→90%","monitorar terças e quintas"],
     checkpoints:true,
@@ -500,12 +502,17 @@ const CICLOS = [
          estavam como "Feira". A confirmar com o Tales. */
       { data:"2026-09-19", desc:"Italo Alunni",               quem:"Tales", valor:150.00, cat:"Alimentação" },
       { data:"2026-09-20", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:108.02, cat:"Mercado" },
+      { data:"2026-09-22", desc:"Shopee *santavenid",         quem:"Nicolle", valor:63.52, parc:{n:1,de:4,total:254.08}, cat:"Compras" },
+      { data:"2026-09-23", desc:"Oba Hortifruti Leopoldina",  quem:"Nicolle", valor:120.98, cat:"Mercado" },
+      { data:"2026-09-23", desc:"Barbearia Piox",             quem:"Tales", valor:65.00,  cat:"Cuidados" },
+      { data:"2026-09-23", desc:"Mercado Livre",              quem:"Tales", valor:27.48, parc:{n:1,de:3,total:82.44}, cat:"Compras" },
+      /* 24/09: "Estorno de anuidade" −R$ 105,00 — crédito, não é compra; fica fora do ciclo. */
     ]
   },
   {
-    /* LIMITE A CONFIRMAR com o Tales antes de 25/09 — por enquanto repete setembro */
-    id:"out", label:"Outubro", inicio:"2026-09-25", fim:"2026-10-24",
-    orcamento:13500, wUtil:5, wFds:4, limiteConfirmado:false,
+    /* Fatura de NOVEMBRO (fecha 24/10). Limite R$ 13.500 confirmado pelo Tales em 25/09. */
+    id:"out", label:"Nov", inicio:"2026-09-25", fim:"2026-10-24",
+    orcamento:13500, wUtil:5, wFds:4, limiteConfirmado:true,
     regras:["ritmo semanal: mais peso de seg a sex","checkpoints 25→20% · 50→50% · 75→75% · 90→90%","monitorar terças e quintas"],
     checkpoints:true,
     lanc:[
@@ -678,7 +685,7 @@ document.getElementById('copiar').onclick=()=>{
 /* ---------- render ---------- */
 function renderTabs(){
   document.getElementById('tabs').innerHTML =
-    `<span class="tabgrp">Cartão</span>`+
+    `<span class="tabgrp">Fatura</span>`+
     CICLOS.map(x=>{
       const fim = hojeISO()>x.fim ? ' ✓' : '';
       return `<button class="tab${x.id===ativo?' on':''}" data-t="${x.id}">${x.label}${fim}</button>`;
@@ -697,20 +704,29 @@ function render(){
   if(ativo==='pag'){ renderPagamentos(); return; }
   if(ativo==='ger'){ renderGeral(); return; }
   const c = CICLOS.find(x=>x.id===ativo) || CICLOS[0];
-  const {DIAS,qUtil,qFds,frac} = cotas(c);
+  const {DIAS,frac} = cotas(c);
   const n=DIAS.length, HOJE=hojeISO();
   const dentro = HOJE>=c.inicio && HOJE<=c.fim;
   const iHoje = Math.min(Math.max(difDias(c.inicio,HOJE),0),n-1);
   const encerrado = HOJE>c.fim, futuroCiclo = HOJE<c.inicio;
 
   const TODOS = lancDoCiclo(c);
-  const porDiaMap={}; TODOS.forEach(l=>{porDiaMap[l.data]=(porDiaMap[l.data]||0)+l.valor});
-  const gasto=TODOS.reduce((s,l)=>s+l.valor,0), restante=c.orcamento-gasto;
+  /* Parcelas herdadas de faturas anteriores são compromisso FIXO: já contam no gasto desde o
+     dia 1 e saem do orçamento antes do plano diário. O ritmo é medido só no gasto variável. */
+  const fixo=TODOS.filter(l=>l.herdada).reduce((s,l)=>s+l.valor,0);
+  const orcVar=Math.max(c.orcamento-fixo,0);
+  const somaPesos=DIAS.reduce((a,x)=>a+peso(c,x),0);
+  const qUtil=orcVar*c.wUtil/somaPesos, qFds=orcVar*c.wFds/somaPesos;
+  const cotaDia=x=>orcVar*frac(x);
+  const porDiaMap={}; TODOS.filter(l=>!l.herdada).forEach(l=>{porDiaMap[l.data]=(porDiaMap[l.data]||0)+l.valor});
+  const gastoVar=TODOS.filter(l=>!l.herdada).reduce((s,l)=>s+l.valor,0);
+  const gasto=fixo+gastoVar, restante=c.orcamento-gasto;
   const gHoje=dentro?(porDiaMap[HOJE]||0):0;
 
   /* plano acumulado */
-  let acc=0; const plano=DIAS.map(s=>acc+=c.orcamento*frac(s));
-  const esperado = futuroCiclo?0:(encerrado?c.orcamento:plano[iHoje]);
+  let acc=fixo; const plano=DIAS.map(s=>acc+=cotaDia(s));   /* o plano parte do que já está comprometido */
+  const esperado = futuroCiclo?fixo:(encerrado?c.orcamento:plano[iHoje]);
+  const esperadoVar = Math.max(esperado-fixo,0);
   const pctGasto=Math.min(Math.max(gasto/c.orcamento*100,0),100);
   const pctEsper=Math.min(esperado/c.orcamento*100,100);
   const pctTempo=futuroCiclo?0:(encerrado?100:((iHoje+1)/n*100));
@@ -737,13 +753,14 @@ function render(){
   document.getElementById('regras').innerHTML =
     `Orçamento <b>${brl(c.orcamento)}</b>`+
     (c.limiteConfirmado===false?`<span class="aviso">limite a confirmar</span>`:'')+
+    (fixo>0?` <span class="sep">·</span> <span style="white-space:nowrap">parcelas <b>${k(fixo)}</b> → livre <b>${k(orcVar)}</b></span>`:'')+
     ` <span class="sep">·</span> <span style="white-space:nowrap"><b>${k(qUtil)}</b>/dia útil</span> <span class="sep">·</span> <span style="white-space:nowrap"><b>${k(qFds)}</b>/sáb-dom</span>`+
     (c.checkpoints?` <span class="sep">·</span> <span style="white-space:nowrap">≈ <b>${k(semana)}</b>/semana</span>`:'')+
     (c.checkpoints?`<br>checkpoints 25→20% · 50→50% · 75→75% · 90→90%`:'');
 
   /* duas projeções: ritmo médio do ciclo (suave) e ritmo dos últimos 7 dias (reage rápido).
      A cor do status usa a PIOR das duas — a média longa esconde aceleração. */
-  const projMes=esperado>0?c.orcamento*(gasto/esperado):gasto;
+  const projMes=esperadoVar>0?fixo+orcVar*(gastoVar/esperadoVar):gasto;
   const diasPassados=dentro?DIAS.slice(Math.max(0,iHoje-6),iHoje+1):[];   /* hoje + 6 anteriores */
   const gasto7=diasPassados.reduce((s,x)=>s+(porDiaMap[x]||0),0);
   const media7=diasPassados.length?gasto7/diasPassados.length:0;
@@ -766,8 +783,9 @@ function render(){
   let chkHtml='';
   if(c.checkpoints&&!futuroCiclo){
     const perm=chkPermitido(pctTempo);
-    const okc=pctGasto<=perm+0.5;
-    chkHtml=`<div class="chk">Checkpoint: <b>${pctTempo.toFixed(0)}%</b> do ciclo → orçamento deveria estar em até <b>${perm.toFixed(0)}%</b> · está em <b style="color:${okc?'var(--ok)':'var(--bad)'}">${pctGasto.toFixed(0)}%</b></div>`;
+    const pctVar=orcVar>0?Math.min(gastoVar/orcVar*100,100):0;   /* o checkpoint mede o ritmo do gasto variável */
+    const okc=pctVar<=perm+0.5;
+    chkHtml=`<div class="chk">Checkpoint: <b>${pctTempo.toFixed(0)}%</b> do ciclo → gasto livre deveria estar em até <b>${perm.toFixed(0)}%</b> · está em <b style="color:${okc?'var(--ok)':'var(--bad)'}">${pctVar.toFixed(0)}%</b>${fixo>0?` <span style="opacity:.7">(fora as parcelas)</span>`:''}</div>`;
   }
 
   /* terças e quintas: média por dia comparada com os outros dias já passados */
@@ -872,9 +890,9 @@ function render(){
   document.getElementById('cards').innerHTML=cards;
   document.getElementById('sw1').style.background=cor;
 
-  desenharGrafico(c,DIAS,frac,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto);
+  desenharGrafico(c,DIAS,cotaDia,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto,fixo);
   desenharCategorias(c,TODOS,gasto);
-  desenharTabela(c,TODOS,frac);
+  desenharTabela(c,TODOS,cotaDia);
 
   document.getElementById('foot').innerHTML =
     `Ciclo ${c.label}: ${fmtD(c.inicio)} → ${fmtD(c.fim)} · dados oficiais atualizados em ${ATUALIZADO} pelo Claude · versão ${VERSAO}.<br>`+
@@ -882,14 +900,14 @@ function render(){
 }
 
 /* ---------- gráfico ---------- */
-function desenharGrafico(c,DIAS,frac,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto){
+function desenharGrafico(c,DIAS,cotaDia,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto,fixo){
   const W=760,H=250,ML=64,MR=16,MT=20,MB=40, iw=W-ML-MR, ih=H-MT-MB;
   const n=DIAS.length;
   const x=i=>ML+(n<=1?iw/2:i/(n-1)*iw);
   const maxY=Math.max(c.orcamento,gasto)*1.05;
   const y=v=>MT+ih-(v/maxY)*ih;
   const ate=encerrado?n-1:(dentro?iHoje:-1);
-  const real=[]; let s=0;
+  const real=[]; let s=fixo||0;
   for(let i=0;i<=ate;i++){ s+=porDiaMap[DIAS[i]]||0; real.push(s); }
 
   let g='';
@@ -935,7 +953,7 @@ function desenharGrafico(c,DIAS,frac,plano,porDiaMap,iHoje,dentro,encerrado,cor,
       `<b>${d(dt).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'})}</b>`+
       `${ehFds(dt)?' · fim de semana':''}<br>`+
       (fut?`<span style="color:var(--muted)">ainda não chegou</span><br>`
-          :`gasto no dia: ${brl(porDiaMap[dt]||0)} <span style="color:var(--muted)">(cota ${brl(c.orcamento*frac(dt))})</span><br>acumulado: <b>${brl(real[i]||0)}</b><br>`)+
+          :`gasto no dia: ${brl(porDiaMap[dt]||0)} <span style="color:var(--muted)">(cota ${brl(cotaDia(dt))})</span><br>acumulado: <b>${brl(real[i]||0)}</b><br>`)+
       `plano acumulado: ${brl(plano[i])}`;
     const r=svg.getBoundingClientRect(), px=(x(i)/W)*r.width;
     tip.style.opacity='1';
@@ -969,7 +987,7 @@ function desenharCategorias(c,TODOS,gasto){
 
 /* ---------- tabela ---------- */
 let tabelaCompleta=false;   /* mostra só os últimos 7 dias por padrão — a lista chega a 130+ linhas */
-function desenharTabela(c,TODOS,frac){
+function desenharTabela(c,TODOS,cotaDia){
   const el=document.getElementById('tabela');
   if(!TODOS.length){ el.innerHTML='<div class="empty">Nenhum gasto lançado neste ciclo ainda.</div>'; return; }
   const porData={}; TODOS.forEach(l=>{(porData[l.data]=porData[l.data]||[]).push(l)});
@@ -978,11 +996,12 @@ function desenharTabela(c,TODOS,frac){
   const ocultos=datas.length-visiveis.length;
   let h='<div class="card" style="padding:6px 4px"><table><thead><tr><th>Descrição</th><th class="num">Valor</th></tr></thead><tbody>';
   visiveis.forEach(dt=>{
-    const tot=porData[dt].reduce((s,l)=>s+l.valor,0), cota=c.orcamento*frac(dt);
+    const tot=porData[dt].reduce((s,l)=>s+l.valor,0), cota=cotaDia(dt);
+    const totVar=porData[dt].filter(l=>!l.herdada).reduce((s,l)=>s+l.valor,0);
     const kk=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
     h+=`<tr class="day"><td colspan="2"><div class="dayrow"><span>${d(dt).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}`+
        `${ehFds(dt)?'<span class="fds">fim de semana</span>':''}</span>`+
-       `<span class="num">${brl(tot)}<span class="cota${tot>cota?' estourou':''}">${tot>cota?`${kk(tot-cota)} acima da cota de ${kk(cota)}`:`cota ${kk(cota)}`}</span></span></div></td></tr>`;
+       `<span class="num">${brl(tot)}<span class="cota${totVar>cota?' estourou':''}">${totVar>cota?`${kk(totVar-cota)} acima da cota de ${kk(cota)}`:`cota ${kk(cota)}`}${tot>totVar?` · ${kk(tot-totVar)} em parcelas`:''}</span></span></div></td></tr>`;
     porData[dt].forEach(l=>{
       const li=l.local?locais().findIndex(z=>z.data===l.data&&z.desc===l.desc&&z.valor===l.valor&&z.quem===l.quem):-1;
       h+=`<tr><td>${descDe(l)}<span class="who">${l.quem}</span>${l.cat?`<span class="catchip">${l.cat}</span>`:''}${l.local?'<span class="tag-local">neste aparelho</span>':''}</td>`+
@@ -1321,7 +1340,7 @@ document.getElementById('pagCopiar').onclick=()=>{
 };
 
 /* ---------- abertura automática (fica no fim: render() usa o que está acima) ---------- */
-/* a página SEMPRE abre no ciclo de cartão vigente (hoje: Setembro).
+/* a página SEMPRE abre na fatura vigente (a partir de 25/09: Nov).
    Trocar de aba durante a visita funciona normalmente, mas não fica salvo. */
 ativo = cicloVigente();
 let jaEntrou=false;
