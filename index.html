@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 53 de 26/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 54 de 26/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -271,7 +271,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "26/09/2026";
-const VERSAO     = "53";   // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "54";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -596,9 +596,10 @@ function parcelasHerdadas(c){
   }
   return out;
 }
+/* O orçamento da fatura vale para COMPRAS NOVAS. Parcelas de faturas anteriores existem na fatura
+   real, mas ficam fora da conta (pedido do Tales em 26/09) — aparecem só num card informativo. */
 function lancDoCiclo(c){
   return c.lanc.map(l=>({...l}))
-    .concat(parcelasHerdadas(c))
     .concat(locais().filter(l=>l.data>=c.inicio&&l.data<=c.fim));
 }
 /* quanto do PRÓXIMO ciclo já está comprometido por parcelas dos ciclos anteriores */
@@ -883,12 +884,21 @@ function render(){
       </div>
     </div>`;
   }
+  const herd=parcelasHerdadas(c), herdTot=herd.reduce((s,l)=>s+l.valor,0);
+  if(herd.length){
+    cards+=`
+    <div class="card">
+      <div class="lbl">Parcelas de faturas anteriores</div>
+      <div class="val" style="color:var(--muted)">${brl(herdTot)}</div>
+      <div class="note">${herd.length} parcela(s) que caem nesta fatura — <b>fora do orçamento</b>, que vale só para compras novas</div>
+    </div>`;
+  }
   if(comp.n){
     cards+=`
     <div class="card">
-      <div class="lbl">Parcelas já no próximo ciclo</div>
+      <div class="lbl">Parcelas para a próxima fatura</div>
       <div class="val" style="color:var(--warn)">${brl(comp.total)}</div>
-      <div class="note">${comp.n} compra(s) parcelada(s) — entram sozinhas no ciclo seguinte antes de qualquer gasto novo</div>
+      <div class="note">${comp.n} compra(s) desta fatura que continuam na próxima — informativo, fora do orçamento</div>
     </div>`;
   }
   if(c.checkpoints && tq.length && outros.length){
