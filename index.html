@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 54 de 26/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 55 de 28/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "26/09/2026";
-const VERSAO     = "54";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "28/09/2026";
+const VERSAO     = "55";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -530,6 +530,16 @@ const CICLOS = [
       { data:"2026-09-26", desc:"Italo Alunni",               quem:"Tales", valor:196.00, cat:"Alimentação" },
       { data:"2026-09-26", desc:"Padaria e restaurante",      quem:"Tales", valor:42.50,  cat:"Alimentação" },
       { data:"2026-09-26", desc:"iFood — Guilherme",          quem:"Nicolle", valor:38.99, cat:"Alimentação" },
+      { data:"2026-09-27", desc:"Jardineira Grill",           quem:"Tales", valor:734.27, cat:"Alimentação" },
+      { data:"2026-09-27", desc:"Mercado Livre *lojababys",   quem:"Tales", valor:313.66, cat:"Compras" },
+      { data:"2026-09-27", desc:"Clube Livelo",               quem:"Tales", valor:129.90, cat:"Assinaturas" },
+      { data:"2026-09-27", desc:"Shopee *trindato",           quem:"Nicolle", valor:74.89, parc:{n:1,de:2,total:149.78}, cat:"Compras" },
+      { data:"2026-09-27", desc:"Mercado Livre *valentin",    quem:"Nicolle", valor:63.90, cat:"Compras" },
+      { data:"2026-09-27", desc:"Mercado Livre",              quem:"Tales", valor:55.24, parc:{n:1,de:10,total:552.40}, cat:"Compras" },
+      { data:"2026-09-27", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:36.07,  cat:"Mercado" },
+      { data:"2026-09-27", desc:"Blu Gestão (estacionamento?)", quem:"Tales", valor:20.00, cat:"Transporte" },
+      { data:"2026-09-28", desc:"Mercado Livre *roddexsh",    quem:"Tales", valor:259.90, cat:"Compras" },
+      { data:"2026-09-28", desc:"Mercado Livre",              quem:"Nicolle", valor:53.68, parc:{n:1,de:7,total:375.75}, cat:"Compras" },
     ]
   }
 ];
