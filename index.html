@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 55 de 28/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 56 de 28/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -271,7 +271,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "28/09/2026";
-const VERSAO     = "55";   // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "56";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -514,6 +514,8 @@ const CICLOS = [
     /* Fatura de NOVEMBRO (fecha 24/10). Limite R$ 13.500 confirmado pelo Tales em 25/09. */
     id:"out", label:"Nov", inicio:"2026-09-25", fim:"2026-10-24",
     orcamento:13500, wUtil:5, wFds:4, limiteConfirmado:true,
+    /* verba extra concentrada numa janela de dias (pedido do Tales em 28/09) */
+    extras:[ { valor:3000, de:"2026-09-25", ate:"2026-10-05", motivo:"aniversário do Miguel" } ],
     regras:["ritmo semanal: mais peso de seg a sex","checkpoints 25→20% · 50→50% · 75→75% · 90→90%","monitorar terças e quintas"],
     checkpoints:true,
     lanc:[
@@ -738,21 +740,29 @@ function render(){
   /* Parcelas herdadas de faturas anteriores são compromisso FIXO: já contam no gasto desde o
      dia 1 e saem do orçamento antes do plano diário. O ritmo é medido só no gasto variável. */
   const fixo=TODOS.filter(l=>l.herdada).reduce((s,l)=>s+l.valor,0);
-  const orcVar=Math.max(c.orcamento-fixo,0);
+  /* verbas extras: cada uma é distribuída (pelos mesmos pesos útil/fds) só nos dias da sua janela */
+  const extras=(c.extras||[]).map(e=>{
+    const dias=DIAS.filter(x=>x>=e.de&&x<=e.ate), soma=dias.reduce((a,x)=>a+peso(c,x),0);
+    return {...e, dias, porDia:x=>(x>=e.de&&x<=e.ate&&soma>0)?e.valor*peso(c,x)/soma:0};
+  });
+  const extrasTot=extras.reduce((a,e)=>a+e.valor,0);
+  const orcTotal=c.orcamento+extrasTot;
+  const orcVar=Math.max(orcTotal-fixo,0);
   const somaPesos=DIAS.reduce((a,x)=>a+peso(c,x),0);
-  const qUtil=orcVar*c.wUtil/somaPesos, qFds=orcVar*c.wFds/somaPesos;
-  const cotaDia=x=>orcVar*frac(x);
+  const orcBaseVar=Math.max(c.orcamento-fixo,0);
+  const qUtil=orcBaseVar*c.wUtil/somaPesos, qFds=orcBaseVar*c.wFds/somaPesos;   /* cotas do orçamento base */
+  const cotaDia=x=>orcBaseVar*frac(x)+extras.reduce((a,e)=>a+e.porDia(x),0);
   const porDiaMap={}; TODOS.filter(l=>!l.herdada).forEach(l=>{porDiaMap[l.data]=(porDiaMap[l.data]||0)+l.valor});
   const gastoVar=TODOS.filter(l=>!l.herdada).reduce((s,l)=>s+l.valor,0);
-  const gasto=fixo+gastoVar, restante=c.orcamento-gasto;
+  const gasto=fixo+gastoVar, restante=orcTotal-gasto;
   const gHoje=dentro?(porDiaMap[HOJE]||0):0;
 
   /* plano acumulado */
   let acc=fixo; const plano=DIAS.map(s=>acc+=cotaDia(s));   /* o plano parte do que já está comprometido */
-  const esperado = futuroCiclo?fixo:(encerrado?c.orcamento:plano[iHoje]);
+  const esperado = futuroCiclo?fixo:(encerrado?orcTotal:plano[iHoje]);
   const esperadoVar = Math.max(esperado-fixo,0);
-  const pctGasto=Math.min(Math.max(gasto/c.orcamento*100,0),100);
-  const pctEsper=Math.min(esperado/c.orcamento*100,100);
+  const pctGasto=Math.min(Math.max(gasto/orcTotal*100,0),100);
+  const pctEsper=Math.min(esperado/orcTotal*100,100);
   const pctTempo=futuroCiclo?0:(encerrado?100:((iHoje+1)/n*100));
 
   /* redistribuição do restante */
@@ -775,7 +785,7 @@ function render(){
   const semana=5*qUtil+2*qFds;
   const k=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
   document.getElementById('regras').innerHTML =
-    `Orçamento <b>${brl(c.orcamento)}</b>`+
+    `Orçamento <b>${brl(c.orcamento)}</b>`+(extras.length?` + <b>${brl(extrasTot)}</b> (${extras.map(e=>e.motivo+", até "+fmtD(e.ate)).join("; ")}) = <b>${brl(orcTotal)}</b>`:"")+
     (c.limiteConfirmado===false?`<span class="aviso">limite a confirmar</span>`:'')+
     (fixo>0?` <span class="sep">·</span> <span style="white-space:nowrap">parcelas <b>${k(fixo)}</b> → livre <b>${k(orcVar)}</b></span>`:'')+
     ` <span class="sep">·</span> <span style="white-space:nowrap"><b>${k(qUtil)}</b>/dia útil</span> <span class="sep">·</span> <span style="white-space:nowrap"><b>${k(qFds)}</b>/sáb-dom</span>`+
@@ -795,13 +805,13 @@ function render(){
   /* status + cor */
   let cor='var(--ok)', rot='Dentro do plano', txt=`${brl(esperado-gasto)} abaixo do previsto até hoje`;
   if(encerrado){ rot='Ciclo encerrado';
-    txt = gasto>c.orcamento ? `fechou ${brl(gasto-c.orcamento)} acima do orçamento`
-                            : `fechou com ${brl(c.orcamento-gasto)} de sobra`;
-    cor = gasto>c.orcamento?'var(--bad)':'var(--ok)'; }
-  else if(gasto>c.orcamento){cor='var(--bad)';rot='Estourou o orçamento';txt=`${brl(gasto-c.orcamento)} acima do limite`;}
-  else if(!futuroCiclo&&projecao>c.orcamento*1.02){cor='var(--bad)';rot='Acima do plano';txt=`no ritmo atual, fecha ${brl(projecao-c.orcamento)} acima`;}
+    txt = gasto>orcTotal ? `fechou ${brl(gasto-orcTotal)} acima do orçamento`
+                            : `fechou com ${brl(orcTotal-gasto)} de sobra`;
+    cor = gasto>orcTotal?'var(--bad)':'var(--ok)'; }
+  else if(gasto>orcTotal){cor='var(--bad)';rot='Estourou o orçamento';txt=`${brl(gasto-orcTotal)} acima do limite`;}
+  else if(!futuroCiclo&&projecao>orcTotal*1.02){cor='var(--bad)';rot='Acima do plano';txt=`no ritmo atual, fecha ${brl(projecao-orcTotal)} acima`;}
   else if(!futuroCiclo&&gasto>esperado){cor='var(--warn)';rot='Atenção';txt=`${brl(gasto-esperado)} acima do previsto até hoje`;}
-  else if(futuroCiclo){rot='Ciclo ainda não começou';txt=`orçamento ${brl(c.orcamento)} intacto`;}
+  else if(futuroCiclo){rot='Ciclo ainda não começou';txt=`orçamento ${brl(orcTotal)} intacto`;}
 
   /* checkpoint (setembro) */
   let chkHtml='';
@@ -828,14 +838,14 @@ function render(){
     <div class="val" style="color:${restante<0?'var(--bad)':'inherit'}">${brl(restante)}</div>
     <div class="barwrap"><div class="barfill"><div class="bar" style="width:${pctGasto}%;background:${cor}"></div></div>
       <div class="tick" style="left:${pctEsper}%" title="plano previa ${brl(esperado)} até aqui"></div></div>
-    <div class="legend"><span>gasto ${brl(gasto)} (${pctGasto.toFixed(0)}%)</span><span>orçamento ${brl(c.orcamento)}</span></div>
+    <div class="legend"><span>gasto ${brl(gasto)} (${pctGasto.toFixed(0)}%)</span><span>orçamento ${brl(orcTotal)}</span></div>
     <div class="status" style="color:${cor};background:color-mix(in srgb, currentColor 14%, transparent)">
       <span class="dot"></span>${rot} — ${txt}</div>
     ${chkHtml}
   </div>`;
   if(encerrado && TODOS.length){
     /* resumo de fechamento do ciclo */
-    const dif=gasto-c.orcamento;
+    const dif=gasto-orcTotal;
     const diaTop=Object.entries(porDiaMap).sort((a,b)=>b[1]-a[1])[0];
     const porCat={}; TODOS.forEach(l=>{ if(l.cat) porCat[l.cat]=(porCat[l.cat]||0)+l.valor; });
     const catTop=Object.entries(porCat).sort((a,b)=>b[1]-a[1])[0];
@@ -845,7 +855,7 @@ function render(){
     <div class="card">
       <div class="lbl">Resultado final</div>
       <div class="val" style="color:${dif>0?'var(--bad)':'var(--ok)'}">${dif>0?'+':'−'}${brl(Math.abs(dif))}</div>
-      <div class="note">${dif>0?'acima':'abaixo'} do orçamento · ${(gasto/c.orcamento*100).toFixed(0)}% do previsto</div>
+      <div class="note">${dif>0?'acima':'abaixo'} do orçamento · ${(gasto/orcTotal*100).toFixed(0)}% do previsto</div>
     </div>
     <div class="card">
       <div class="lbl">Dia mais caro</div>
@@ -880,12 +890,12 @@ function render(){
     </div>`;
   }
   if(dentro){
-    const corP=v=>v>c.orcamento?'var(--bad)':'var(--ok)';
+    const corP=v=>v>orcTotal?'var(--bad)':'var(--ok)';
     cards+=`
     <div class="card big">
       <div class="lbl">Projeção de fechamento</div>
       <div class="val" style="color:${corP(projecao)}">${brl(projecao)}</div>
-      <div class="note">${projecao>c.orcamento?`${brl(projecao-c.orcamento)} acima do orçamento`:`${brl(c.orcamento-projecao)} de folga`}
+      <div class="note">${projecao>orcTotal?`${brl(projecao-orcTotal)} acima do orçamento`:`${brl(orcTotal-projecao)} de folga`}
         — o status acima usa a pior das duas leituras</div>
       <div class="proj2">
         <div><div class="k">ritmo do mês</div><div class="v" style="color:${corP(projMes)}">${brl(projMes)}</div></div>
@@ -923,7 +933,7 @@ function render(){
   document.getElementById('cards').innerHTML=cards;
   document.getElementById('sw1').style.background=cor;
 
-  desenharGrafico(c,DIAS,cotaDia,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto,fixo);
+  desenharGrafico(c,DIAS,cotaDia,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto,fixo,orcTotal);
   desenharCategorias(c,TODOS,gasto);
   desenharTabela(c,TODOS,cotaDia);
 
@@ -933,11 +943,11 @@ function render(){
 }
 
 /* ---------- gráfico ---------- */
-function desenharGrafico(c,DIAS,cotaDia,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto,fixo){
+function desenharGrafico(c,DIAS,cotaDia,plano,porDiaMap,iHoje,dentro,encerrado,cor,gasto,fixo,orcTotal){
   const W=760,H=250,ML=64,MR=16,MT=20,MB=40, iw=W-ML-MR, ih=H-MT-MB;
   const n=DIAS.length;
   const x=i=>ML+(n<=1?iw/2:i/(n-1)*iw);
-  const maxY=Math.max(c.orcamento,gasto)*1.05;
+  const maxY=Math.max(orcTotal||c.orcamento,gasto)*1.05;
   const y=v=>MT+ih-(v/maxY)*ih;
   const ate=encerrado?n-1:(dentro?iHoje:-1);
   const real=[]; let s=fixo||0;
