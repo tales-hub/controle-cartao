@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 56 de 28/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 57 de 28/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -271,7 +271,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "28/09/2026";
-const VERSAO     = "56";   // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "57";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -542,6 +542,16 @@ const CICLOS = [
       { data:"2026-09-27", desc:"Blu Gestão (estacionamento?)", quem:"Tales", valor:20.00, cat:"Transporte" },
       { data:"2026-09-28", desc:"Mercado Livre *roddexsh",    quem:"Tales", valor:259.90, cat:"Compras" },
       { data:"2026-09-28", desc:"Mercado Livre",              quem:"Nicolle", valor:53.68, parc:{n:1,de:7,total:375.75}, cat:"Compras" },
+      { data:"2026-09-28", desc:"Hiper Zaffari",              quem:"Tales", valor:1855.00, cat:"Mercado" },
+      { data:"2026-09-28", desc:"Laes Bar e Lanches",         quem:"Tales", valor:274.59, cat:"Alimentação" },
+      { data:"2026-09-28", desc:"iFood — Aldemar Decio",      quem:"Nicolle", valor:64.34, cat:"Alimentação" },
+      { data:"2026-09-28", desc:"Amazon BR",                  quem:"Nicolle", valor:24.72, parc:{n:1,de:8,total:197.73}, cat:"Compras" },
+      /* blugestaoe R$ 20 aparece em 27/09 e em 28/09 — dois lançamentos ou re-datação? A confirmar. */
+      { data:"2026-09-28", desc:"Blu Gestão (estacionamento?)", quem:"Tales", valor:20.00, cat:"Transporte" },
+      { data:"2026-09-28", desc:"Uber",                       quem:"Tales", valor:16.94,  cat:"Transporte" },
+      { data:"2026-09-28", desc:"Uber",                       quem:"Tales", valor:11.99,  cat:"Transporte" },
+      { data:"2026-09-28", desc:"Grão Espresso",              quem:"Tales", valor:10.00,  cat:"Alimentação" },
+      /* 28/09: "uber uber * pending R$ 9,96" riscado = estorno, não lançado. */
     ]
   }
 ];
