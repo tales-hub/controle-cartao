@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 57 de 28/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 58 de 30/09/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "28/09/2026";
-const VERSAO     = "57";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "30/09/2026";
+const VERSAO     = "58";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -551,7 +551,15 @@ const CICLOS = [
       { data:"2026-09-28", desc:"Uber",                       quem:"Tales", valor:16.94,  cat:"Transporte" },
       { data:"2026-09-28", desc:"Uber",                       quem:"Tales", valor:11.99,  cat:"Transporte" },
       { data:"2026-09-28", desc:"Grão Espresso",              quem:"Tales", valor:10.00,  cat:"Alimentação" },
-      /* 28/09: "uber uber * pending R$ 9,96" riscado = estorno, não lançado. */
+      /* 28/09: "uber uber * pending R$ 9,96" apareceu riscado; em 30/09 reapareceu normal (re-datado). Lançado em 30/09. */
+      { data:"2026-09-29", desc:"99food",                     quem:"Tales", valor:107.41, cat:"Alimentação" },
+      { data:"2026-09-29", desc:"Mercado Livre (beleza)",     quem:"Nicolle", valor:71.97, cat:"Cuidados" },
+      { data:"2026-09-30", desc:"Ana Caroline (salão)",       quem:"Tales", valor:135.00, cat:"Cuidados" },
+      { data:"2026-09-30", desc:"iFood — Farmácia",           quem:"Nicolle", valor:92.80, cat:"Saúde" },
+      { data:"2026-09-30", desc:"Pet Supermarket",            quem:"Nicolle", valor:61.52, cat:"Pet" },
+      { data:"2026-09-30", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:15.55,  cat:"Mercado" },
+      { data:"2026-09-30", desc:"Uber",                       quem:"Tales", valor:14.95,  cat:"Transporte" },
+      { data:"2026-09-30", desc:"Uber",                       quem:"Tales", valor:9.96,   cat:"Transporte" },
     ]
   }
 ];
