@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 58 de 30/09/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 59 de 04/10/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "30/09/2026";
-const VERSAO     = "58";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "04/10/2026";
+const VERSAO     = "59";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -290,7 +290,7 @@ const MESES = [
 /* venc = dia do mês (1–31). vencNota = quando não há dia fixo. Datas informadas pelo Tales em 01/09. */
 const CONTAS_DEF = [
   { id:"aluguel-apto",  curto:"Aluguel apto", nome:"Aluguel + Cond. + IPTU (apartamento)", grupo:"Moradia",           venc:10,   resp:"Casa" },
-  { id:"cartao-itau",   curto:"Itaú", nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           venc:null, vencNota:"data a confirmar", resp:"Casa" },
+  { id:"cartao-itau",   curto:"Itaú", nome:"Cartão Itaú Latam Pass",               grupo:"Cartões",           venc:1,    resp:"Casa" },
   { id:"cartao-nubank", curto:"Nubank", nome:"Cartão Nubank",                        grupo:"Cartões",           venc:1,    resp:"Casa" },
   { id:"escola-miguel", curto:"Escola", nome:"Escola do Miguel",                     grupo:"Educação",          venc:5,    resp:"Casa" },
   { id:"sala-nicolle",  curto:"Sala Nicolle", nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", venc:10, resp:"Nicolle" },
@@ -339,6 +339,8 @@ const OFICIAL = {
   "2026-09:cartao-porto":  { pago:true },
   /* paga em 04/09 — R$ 156 (valor confirmado pelo Tales) */
   "2026-09:internet":      { pago:true },
+  /* fatura Itaú de outubro (R$ 32.250,72) paga em 03/10 — visto no app */
+  "2026-10:cartao-itau":   { pago:true },
 };
 
 const CICLOS = [
@@ -560,6 +562,24 @@ const CICLOS = [
       { data:"2026-09-30", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:15.55,  cat:"Mercado" },
       { data:"2026-09-30", desc:"Uber",                       quem:"Tales", valor:14.95,  cat:"Transporte" },
       { data:"2026-09-30", desc:"Uber",                       quem:"Tales", valor:9.96,   cat:"Transporte" },
+      { data:"2026-09-30", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:139.94, cat:"Mercado" },
+      { data:"2026-10-01", desc:"Seara Alimentos",            quem:"Tales", valor:142.42, parc:{n:1,de:4,total:569.68}, cat:"Mercado" },
+      { data:"2026-10-01", desc:"Sam's Club",                 quem:"Tales", valor:259.59, cat:"Mercado" },
+      { data:"2026-10-01", desc:"Drogaria São Paulo",         quem:"Tales", valor:127.17, cat:"Saúde" },
+      { data:"2026-10-01", desc:"Uber",                       quem:"Tales", valor:54.95,  cat:"Transporte" },
+      { data:"2026-10-01", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:40.98,  cat:"Mercado" },
+      { data:"2026-10-01", desc:"Padaria Leveda",             quem:"Tales", valor:25.00,  cat:"Alimentação" },
+      /* 03/10: "Fatura Paga R$ 32.250,72" e o crédito "Pagamento Efetuado" são a quitação da fatura Out — não são compras. */
+      { data:"2026-10-02", desc:"Padaria e restaurante",      quem:"Tales", valor:183.44, cat:"Alimentação" },
+      { data:"2026-10-02", desc:"Mercado Livre (auto)",       quem:"Tales", valor:109.00, cat:"Transporte" },
+      { data:"2026-10-02", desc:"Mercado Livre (auto)",       quem:"Tales", valor:80.16,  cat:"Transporte" },
+      { data:"2026-10-02", desc:"Barbearia Piox",             quem:"Tales", valor:65.00,  cat:"Cuidados" },
+      { data:"2026-10-02", desc:"Arruda estacionamento",      quem:"Tales", valor:25.00,  cat:"Transporte" },
+      { data:"2026-10-02", desc:"Meire Eloise",               quem:"Tales", valor:24.16,  cat:"Mercado" },
+      { data:"2026-10-02", desc:"Padaria e restaurante",      quem:"Tales", valor:15.17,  cat:"Alimentação" },
+      { data:"2026-10-03", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:183.43, cat:"Mercado" },
+      { data:"2026-10-03", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:19.99,  cat:"Mercado" },
+      { data:"2026-10-04", desc:"Primo Trattoria",            quem:"Tales", valor:355.39, cat:"Alimentação" },
     ]
   }
 ];
