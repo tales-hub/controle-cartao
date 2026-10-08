@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 60 de 05/10/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 61 de 08/10/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "05/10/2026";
-const VERSAO     = "60";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "08/10/2026";
+const VERSAO     = "61";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -585,6 +585,20 @@ const CICLOS = [
       { data:"2026-10-05", desc:"Uber",                       quem:"Tales", valor:53.94,  cat:"Transporte" },
       { data:"2026-10-05", desc:"Uber",                       quem:"Tales", valor:34.15,  cat:"Transporte" },
       { data:"2026-10-05", desc:"Uber",                       quem:"Tales", valor:26.05,  cat:"Transporte" },
+      { data:"2026-10-05", desc:"iFood — Imifarma",           quem:"Nicolle", valor:145.83, cat:"Saúde" },
+      { data:"2026-10-06", desc:"Mp *trekkoacalanto",         quem:"Nicolle", valor:188.91, cat:"Compras" },
+      { data:"2026-10-07", desc:"Pg *erc Magalhães Comércio", quem:"Tales",   valor:155.50, parc:{n:1,de:2,total:311.00}, cat:"Compras" },
+      { data:"2026-10-07", desc:"Mercado Livre",              quem:"Nicolle", valor:217.66, cat:"Compras" },
+      { data:"2026-10-07", desc:"Carinhoso Pet Shop",         quem:"Nicolle", valor:158.00, cat:"Pet" },
+      { data:"2026-10-07", desc:"Oba Hortifruti Leopoldina",  quem:"Tales",   valor:67.12,  cat:"Mercado" },
+      { data:"2026-10-08", desc:"Ferticlin Clínica",          quem:"Tales",   valor:350.00, cat:"Saúde" },
+      { data:"2026-10-08", desc:"Oba Hortifruti Leopoldina",  quem:"Nicolle", valor:152.83, cat:"Mercado" },
+      { data:"2026-10-08", desc:"Ri Happy Brinquedos",        quem:"Tales",   valor:30.83,  parc:{n:1,de:6,total:184.98}, cat:"Compras" },
+      { data:"2026-10-08", desc:"Disney Plus",                quem:"Tales",   valor:69.90,  cat:"Assinaturas" },
+      { data:"2026-10-08", desc:"Mercado Livre",              quem:"Nicolle", valor:47.88,  cat:"Compras" },
+      { data:"2026-10-08", desc:"Almeida Brinquedos",         quem:"Tales",   valor:28.00,  cat:"Compras" },
+      { data:"2026-10-08", desc:"Arruda estacionamento",      quem:"Tales",   valor:25.00,  cat:"Transporte" },
+      { data:"2026-10-08", desc:"Natura",                     quem:"Tales",   valor:20.12,  cat:"Cuidados" },
     ]
   }
 ];
