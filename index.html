@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 61 de 08/10/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 62 de 13/10/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "08/10/2026";
-const VERSAO     = "61";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "13/10/2026";
+const VERSAO     = "62";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -599,6 +599,31 @@ const CICLOS = [
       { data:"2026-10-08", desc:"Almeida Brinquedos",         quem:"Tales",   valor:28.00,  cat:"Compras" },
       { data:"2026-10-08", desc:"Arruda estacionamento",      quem:"Tales",   valor:25.00,  cat:"Transporte" },
       { data:"2026-10-08", desc:"Natura",                     quem:"Tales",   valor:20.12,  cat:"Cuidados" },
+      { data:"2026-10-09", desc:"Uber (pendente)", quem:"Tales", valor:45.60, cat:"Transporte" },
+      { data:"2026-10-09", desc:"Santa Joana", quem:"Tales", valor:1166.68, parc:{n:1,de:3,total:3500.04}, cat:"Saúde" },
+      { data:"2026-10-09", desc:"Mercado Livre", quem:"Tales", valor:261.99, cat:"Casa" },
+      { data:"2026-10-10", desc:"Serv. Nuvem Intelbras", quem:"Tales", valor:20.50, cat:"Casa" },
+      { data:"2026-10-10", desc:"Lanchonete Corsini", quem:"Tales", valor:35.20, cat:"Alimentação" },
+      { data:"2026-10-10", desc:"Lanchonete Corsini", quem:"Tales", valor:36.30, cat:"Alimentação" },
+      { data:"2026-10-10", desc:"Amazon Marketplace — Planetaim", quem:"Nicolle", valor:31.99, parc:{n:1,de:4,total:127.96}, cat:"Compras" },
+      { data:"2026-10-11", desc:"Pedalle Serv e Com", quem:"Tales", valor:140.00, cat:"Casa" },
+      { data:"2026-10-11", desc:"Farmácia e Drogaria Ni", quem:"Tales", valor:51.61, parc:{n:1,de:3,total:154.83}, cat:"Saúde" },
+      { data:"2026-10-11", desc:"Raia (104)", quem:"Tales", valor:132.12, cat:"Saúde" },
+      { data:"2026-10-11", desc:"Oba Hortifruti Leopoldina", quem:"Nicolle", valor:298.02, cat:"Mercado" },
+      { data:"2026-10-11", desc:"Santa Joana", quem:"Tales", valor:250.00, cat:"Saúde" },
+      { data:"2026-10-12", desc:"Seara Alimentos", quem:"Tales", valor:219.44, parc:{n:1,de:4,total:877.76}, cat:"Mercado" },
+      { data:"2026-10-12", desc:"Sams Club", quem:"Tales", valor:676.10, cat:"Compras" },
+      { data:"2026-10-12", desc:"Amazon Prime Canais", quem:"Nicolle", valor:29.90, cat:"Assinaturas" },
+      { data:"2026-10-12", desc:"Amazon Br", quem:"Nicolle", valor:64.90, cat:"Compras" },
+      { data:"2026-10-12", desc:"Oba Hortifruti Leopoldina", quem:"Nicolle", valor:260.85, cat:"Mercado" },
+      { data:"2026-10-12", desc:"iFood — Drogaria Vale", quem:"Nicolle", valor:103.57, cat:"Saúde" },
+      { data:"2026-10-12", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:90.65, cat:"Mercado" },
+      { data:"2026-10-13", desc:"iFood — Shoyu Culinária", quem:"Tales", valor:442.91, cat:"Alimentação" },
+      { data:"2026-10-13", desc:"Tip Top Villa Lobos", quem:"Tales", valor:39.64, parc:{n:1,de:3,total:118.93}, cat:"Compras" },
+      { data:"2026-10-13", desc:"Daiso Brasil", quem:"Tales", valor:65.94, cat:"Compras" },
+      { data:"2026-10-13", desc:"Ofner Villa Lobos", quem:"Tales", valor:109.80, cat:"Mercado" },
+      { data:"2026-10-13", desc:"Raia (2796)", quem:"Tales", valor:91.51, parc:{n:1,de:3,total:274.54}, cat:"Saúde" },
+      { data:"2026-10-13", desc:"Renner Villa Lobos", quem:"Tales", valor:99.70, cat:"Compras" },
     ]
   }
 ];
