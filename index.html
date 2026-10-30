@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 65 de 19/10/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 66 de 29/10/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "19/10/2026";
-const VERSAO     = "65";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "29/10/2026";
+const VERSAO     = "66";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -310,7 +310,7 @@ const CONTAS_DEF = [
 /* valores por conta, na ordem de MESES (set..mai). 0 = a conta não existe naquele mês. */
 const VALORES = {
   "aluguel-apto":  [19700,19700,19700,19700,19700,19700,19700,19700,19700],
-  "cartao-itau":   [0,32250.72,4888,3464,2058,1553,848,529,224],   /* out/26: fatura fechada em 24/09 (app Itaú) — planilha dizia 23.900 */
+  "cartao-itau":   [0,32250.72,28959.12,3464,2058,1553,848,529,224],   /* out/26: 32.250,72 (paga 03/10) · nov/26: 28.959,12 (fatura PDF, vence 01/11) — planilha dizia 23.900 / 4.888 */
   "cartao-nubank": [7240,7000,3678,3678,2378,2378,1715,1007,611],
   "escola-miguel": [5957,5957,5957,5957,5957,5957,5957,5957,5957],
   "sala-nicolle":  [3156.14,4000,4000,4000,3500,3500,3500,3500,3500],  /* set/26: valor real do boleto */
@@ -514,7 +514,7 @@ const CICLOS = [
   },
   {
     /* Fatura de NOVEMBRO (fecha 24/10). Limite R$ 13.500 confirmado pelo Tales em 25/09. */
-    id:"out", label:"Nov", inicio:"2026-09-25", fim:"2026-10-24",
+    id:"out", label:"Nov", inicio:"2026-09-25", fim:"2026-10-22",   /* fatura emitida 23/10 — fechou em R$ 28.959,12 */
     orcamento:13500, wUtil:5, wFds:4, limiteConfirmado:true,
     /* verba extra concentrada numa janela de dias (pedido do Tales em 28/09) */
     extras:[ { valor:3000, de:"2026-09-25", ate:"2026-10-05", motivo:"aniversário do Miguel" } ],
@@ -525,7 +525,7 @@ const CICLOS = [
       { data:"2026-09-25", desc:"Beleza Libre (salão)",       quem:"Tales", valor:405.00, cat:"Cuidados" },
       { data:"2026-09-25", desc:"Clube Latam Pass",           quem:"Tales", valor:356.80, cat:"Assinaturas" },
       { data:"2026-09-25", desc:"Padaria Leveda",             quem:"Tales", valor:93.00,  cat:"Alimentação" },
-      { data:"2026-09-25", desc:"iFood — Mateus",             quem:"Nicolle", valor:85.91, cat:"Alimentação" },
+      { data:"2026-09-25", desc:"iFood — Mateus (85,91 − crédito 18,00)", quem:"Nicolle", valor:67.91, cat:"Alimentação" },
       { data:"2026-09-25", desc:"Shopee *rioclarofestac",     quem:"Nicolle", valor:85.27, parc:{n:1,de:2,total:170.53}, cat:"Compras" },
       { data:"2026-09-25", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:84.87,  cat:"Mercado" },
       { data:"2026-09-25", desc:"Drogasil",                   quem:"Tales", valor:81.78,  cat:"Saúde" },
@@ -543,11 +543,11 @@ const CICLOS = [
       { data:"2026-09-27", desc:"Oba Hortifruti Leopoldina",  quem:"Tales", valor:36.07,  cat:"Mercado" },
       { data:"2026-09-27", desc:"Blu Gestão (estacionamento?)", quem:"Tales", valor:20.00, cat:"Transporte" },
       { data:"2026-09-28", desc:"Mercado Livre *roddexsh",    quem:"Tales", valor:259.90, cat:"Compras" },
-      { data:"2026-09-28", desc:"Mercado Livre",              quem:"Nicolle", valor:53.68, parc:{n:1,de:7,total:375.75}, cat:"Compras" },
+      { data:"2026-09-28", desc:"Mercado Livre",              quem:"Nicolle", valor:53.73, parc:{n:1,de:7,total:376.11}, cat:"Compras" },
       { data:"2026-09-28", desc:"Hiper Zaffari",              quem:"Tales", valor:1855.00, cat:"Mercado" },
       { data:"2026-09-28", desc:"Laes Bar e Lanches",         quem:"Tales", valor:274.59, cat:"Alimentação" },
       { data:"2026-09-28", desc:"iFood — Aldemar Decio",      quem:"Nicolle", valor:64.34, cat:"Alimentação" },
-      { data:"2026-09-28", desc:"Amazon BR",                  quem:"Nicolle", valor:24.72, parc:{n:1,de:8,total:197.73}, cat:"Compras" },
+      { data:"2026-09-28", desc:"Amazon BR",                  quem:"Nicolle", valor:24.76, parc:{n:1,de:8,total:198.08}, cat:"Compras" },
       /* blugestaoe R$ 20 aparece em 27/09 e em 28/09 — dois lançamentos ou re-datação? A confirmar. */
       { data:"2026-09-28", desc:"Blu Gestão (estacionamento?)", quem:"Tales", valor:20.00, cat:"Transporte" },
       { data:"2026-09-28", desc:"Uber",                       quem:"Tales", valor:16.94,  cat:"Transporte" },
@@ -616,13 +616,13 @@ const CICLOS = [
       { data:"2026-10-12", desc:"Amazon Prime Canais", quem:"Nicolle", valor:29.90, cat:"Assinaturas" },
       { data:"2026-10-12", desc:"Amazon Br", quem:"Nicolle", valor:64.90, cat:"Compras" },
       { data:"2026-10-12", desc:"Oba Hortifruti Leopoldina", quem:"Nicolle", valor:260.85, cat:"Mercado" },
-      { data:"2026-10-12", desc:"iFood — Drogaria Vale", quem:"Nicolle", valor:103.57, cat:"Saúde" },
+      { data:"2026-10-12", desc:"iFood — Drogaria Vale", quem:"Nicolle", valor:61.46, cat:"Saúde" },
       { data:"2026-10-12", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:90.65, cat:"Mercado" },
       { data:"2026-10-13", desc:"iFood — Shoyu Culinária", quem:"Tales", valor:442.91, cat:"Alimentação" },
-      { data:"2026-10-13", desc:"Tip Top Villa Lobos", quem:"Tales", valor:39.64, parc:{n:1,de:3,total:118.93}, cat:"Compras" },
+      { data:"2026-10-13", desc:"Tip Top Villa Lobos", quem:"Tales", valor:39.65, parc:{n:1,de:3,total:118.95}, cat:"Compras" },
       { data:"2026-10-13", desc:"Daiso Brasil", quem:"Tales", valor:65.94, cat:"Compras" },
       { data:"2026-10-13", desc:"Ofner Villa Lobos", quem:"Tales", valor:109.80, cat:"Mercado" },
-      { data:"2026-10-13", desc:"Raia (2796)", quem:"Tales", valor:91.51, parc:{n:1,de:3,total:274.54}, cat:"Saúde" },
+      { data:"2026-10-13", desc:"Raia (2796)", quem:"Tales", valor:91.52, parc:{n:1,de:3,total:274.56}, cat:"Saúde" },
       { data:"2026-10-13", desc:"Renner Villa Lobos", quem:"Tales", valor:99.70, cat:"Compras" },
       { data:"2026-10-13", desc:"Mercado Livre", quem:"Nicolle", valor:147.72, cat:"Compras" },
       { data:"2026-10-14", desc:"Shopee — Novo Dia Comércio", quem:"Nicolle", valor:96.66, cat:"Compras" },
@@ -644,6 +644,52 @@ const CICLOS = [
       { data:"2026-10-18", desc:"Panvel Filial 804", quem:"Tales", valor:95.51, parc:{n:1,de:3,total:286.53}, cat:"Saúde" },
       { data:"2026-10-18", desc:"Hiper Zaffari São Paulo", quem:"Tales", valor:406.40, cat:"Mercado" },
       { data:"2026-10-18", desc:"Vetstecnologia", quem:"Tales", valor:13.00, cat:"Compras" },
+      /* 19–22/10: conferidos na fatura PDF (emitida 23/10) */
+      { data:"2026-10-19", desc:"Ferticlin Clínica", quem:"Tales", valor:4666.68, parc:{n:1,de:3,total:14000.04}, cat:"Saúde" },
+      { data:"2026-10-19", desc:"Arruda estacionamento", quem:"Tales", valor:25.00, cat:"Transporte" },
+      { data:"2026-10-19", desc:"Amazon Marketplace", quem:"Nicolle", valor:53.13, parc:{n:1,de:6,total:318.78}, cat:"Compras" },
+      { data:"2026-10-21", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:218.58, cat:"Mercado" },
+      { data:"2026-10-21", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:9.99, cat:"Mercado" },
+      { data:"2026-10-21", desc:"Empório Tudim de Minas", quem:"Tales", valor:58.00, cat:"Mercado" },
+      { data:"2026-10-21", desc:"Caldo de cana Cardoso", quem:"Tales", valor:24.00, cat:"Alimentação" },
+      { data:"2026-10-21", desc:"Italo Alunni", quem:"Tales", valor:44.00, cat:"Alimentação" },
+      { data:"2026-10-21", desc:"RD Saúde Online", quem:"Nicolle", valor:61.48, cat:"Saúde" },
+      { data:"2026-10-21", desc:"RD Saúde Online", quem:"Nicolle", valor:41.07, cat:"Saúde" },
+      { data:"2026-10-22", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:104.53, cat:"Mercado" },
+      { data:"2026-10-22", desc:"iFood — Farmácia", quem:"Nicolle", valor:170.81, cat:"Saúde" },
+    ]
+  },
+  {
+    /* Fatura de DEZEMBRO: do dia seguinte à emissão da fatura Nov (23/10) até o próximo fechamento
+       previsto na fatura PDF (23/11). Cota "conforme agosto": R$ 500 dia útil · R$ 400 fim de semana
+       → 22 úteis × 500 + 10 fds × 400 = R$ 15.000. */
+    id:"nov", label:"Dez", inicio:"2026-10-23", fim:"2026-11-23",
+    orcamento:15000, wUtil:5, wFds:4, limiteConfirmado:true,
+    regras:["R$ 500 por dia útil · R$ 400 por dia de fim de semana","checkpoints 25→20% · 50→50% · 75→75% · 90→90%","monitorar terças e quintas"],
+    checkpoints:true,
+    lanc:[
+      /* "Anuidade Diferenci 08/12" R$ 105 (24/10) — tarifa; a 07/12 foi estornada em 23/10. Fora do orçamento. */
+      { data:"2026-10-23", desc:"Oba Hortifruti Leopoldina", quem:"Nicolle", valor:33.11, cat:"Mercado" },
+      { data:"2026-10-24", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:427.83, cat:"Mercado" },
+      { data:"2026-10-24", desc:"Amazon Marketplace", quem:"Nicolle", valor:38.66, parc:{n:1,de:6,total:231.96}, cat:"Compras" },
+      { data:"2026-10-24", desc:"Bikeok Serviços ao Ciclista", quem:"Tales", valor:15.00, cat:"Transporte" },
+      { data:"2026-10-24", desc:"Bikeok Serviços ao Ciclista", quem:"Tales", valor:24.00, cat:"Transporte" },
+      { data:"2026-10-24", desc:"Shopee *alcomercio", quem:"Nicolle", valor:92.97, cat:"Compras" },
+      { data:"2026-10-24", desc:"Shopee *foguetedeourom", quem:"Nicolle", valor:70.95, parc:{n:1,de:2,total:141.90}, cat:"Compras" },
+      { data:"2026-10-25", desc:"Clube Latam Pass", quem:"Tales", valor:356.80, cat:"Assinaturas" },
+      { data:"2026-10-25", desc:"Amazon Prime", quem:"Nicolle", valor:166.80, cat:"Assinaturas" },
+      { data:"2026-10-25", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:31.13, cat:"Mercado" },
+      { data:"2026-10-26", desc:"Pg *erc Magalhães Comércio", quem:"Tales", valor:185.66, parc:{n:1,de:2,total:371.32}, cat:"Compras" },
+      { data:"2026-10-26", desc:"Shopee *pinkvestkids", quem:"Nicolle", valor:47.00, cat:"Compras" },
+      { data:"2026-10-27", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:129.43, cat:"Mercado" },
+      { data:"2026-10-27", desc:"iFood — NP Farma", quem:"Nicolle", valor:122.56, cat:"Saúde" },
+      /* 27/10: "Ifd*farmacia e Drogari" R$ 117,35 — CANCELADA no app, não lançada */
+      { data:"2026-10-27", desc:"Clube Livelo", quem:"Tales", valor:129.90, cat:"Assinaturas" },
+      { data:"2026-10-27", desc:"Drogaria São Paulo", quem:"Tales", valor:53.17, cat:"Saúde" },
+      { data:"2026-10-27", desc:"Barbearia Piox", quem:"Tales", valor:65.00, cat:"Cuidados" },
+      { data:"2026-10-28", desc:"Pet Supermarket", quem:"Nicolle", valor:54.28, cat:"Pet" },
+      { data:"2026-10-29", desc:"99food — St Marché", quem:"Nicolle", valor:65.27, cat:"Mercado" },
+      { data:"2026-10-29", desc:"Shopee *evestyfashionl", quem:"Nicolle", valor:111.91, cat:"Compras" },
     ]
   }
 ];
