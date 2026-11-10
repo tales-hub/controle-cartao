@@ -182,7 +182,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 69 de 08/11/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 70 de 10/11/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -270,8 +270,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "08/11/2026";
-const VERSAO     = "69";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "10/11/2026";
+const VERSAO     = "70";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -746,6 +746,17 @@ const CICLOS = [
       { data:"2026-11-07", desc:"Uber (pendente)", quem:"Tales", valor:69.98, cat:"Transporte" },
       { data:"2026-11-08", desc:"Padaria e restaurante", quem:"Tales", valor:41.05, cat:"Alimentação" },
       { data:"2026-11-08", desc:"iFood — Chocomia Sweet", quem:"Nicolle", valor:46.66, cat:"Alimentação" },
+      { data:"2026-11-08", desc:"Almeida Brinquedos", quem:"Tales", valor:28.00, cat:"Lazer" },
+      { data:"2026-11-08", desc:"Pg *erc Magalhães Comércio", quem:"Tales", valor:189.68, parc:{n:1,de:3,total:569.04}, cat:"Compras" },
+      { data:"2026-11-08", desc:"Disney Plus", quem:"Tales", valor:69.90, cat:"Assinaturas" },
+      { data:"2026-11-09", desc:"Uber", quem:"Tales", valor:9.96, cat:"Transporte" },
+      { data:"2026-11-09", desc:"Leticia 3 (feira)", quem:"Tales", valor:41.39, cat:"Mercado" },
+      { data:"2026-11-09", desc:"Uber", quem:"Tales", valor:38.95, cat:"Transporte" },
+      { data:"2026-11-09", desc:"Uber", quem:"Tales", valor:51.24, cat:"Transporte" },
+      /* 09/11: Uber R$ 52,95 — CANCELADA no app, não lançada */
+      { data:"2026-11-09", desc:"iFood — Sugar Cubes", quem:"Nicolle", valor:132.47, cat:"Alimentação" },
+      { data:"2026-11-09", desc:"Pet Supermarket", quem:"Nicolle", valor:6.97, cat:"Pet" },
+      { data:"2026-11-10", desc:"App *yuoolstore", quem:"Tales", valor:90.95, parc:{n:1,de:8,total:727.59}, cat:"Compras" },
     ]
   }
 ];
