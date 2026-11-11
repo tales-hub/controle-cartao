@@ -236,7 +236,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 72 de 11/11/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 73 de 11/11/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -347,21 +347,28 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "11/11/2026";
-const VERSAO     = "72";   // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "73";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
 const MESES = [
+  /* renda: set e out/26 como estavam; nov/26 em diante = "Total de Entradas" da planilha (lida em 11/11/2026) */
   { id:"2026-09", label:"Set/26", renda:69700 },
   { id:"2026-10", label:"Out/26", renda:69700 },
-  { id:"2026-11", label:"Nov/26", renda:69700 },
-  { id:"2026-12", label:"Dez/26", renda:69700 },
-  /* +R$ 10 mil de renda a partir de jan/27 — aumento permanente, não pontual */
-  { id:"2027-01", label:"Jan/27", renda:79700 },
-  { id:"2027-02", label:"Fev/27", renda:79700 },
-  { id:"2027-03", label:"Mar/27", renda:79700 },
-  { id:"2027-04", label:"Abr/27", renda:79700 },
-  { id:"2027-05", label:"Mai/27", renda:79700 },
+  { id:"2026-11", label:"Nov/26", renda:82300 },
+  { id:"2026-12", label:"Dez/26", renda:82000 },
+  { id:"2027-01", label:"Jan/27", renda:82200 },
+  { id:"2027-02", label:"Fev/27", renda:82200 },
+  { id:"2027-03", label:"Mar/27", renda:80900 },
+  { id:"2027-04", label:"Abr/27", renda:80900 },
+  { id:"2027-05", label:"Mai/27", renda:80900 },
+  { id:"2027-06", label:"Jun/27", renda:80900 },
+  { id:"2027-07", label:"Jul/27", renda:80900 },
+  { id:"2027-08", label:"Ago/27", renda:80900 },
+  { id:"2027-09", label:"Set/27", renda:80900 },
+  { id:"2027-10", label:"Out/27", renda:80900 },
+  { id:"2027-11", label:"Nov/27", renda:80900 },
+  { id:"2027-12", label:"Dez/27", renda:80900 },
 ];
 /* venc = dia do mês (1–31). vencNota = quando não há dia fixo. Datas informadas pelo Tales em 01/09. */
 const CONTAS_DEF = [
@@ -372,7 +379,7 @@ const CONTAS_DEF = [
   { id:"sala-nicolle",  curto:"Sala Nicolle", nome:"Aluguel sala comercial + Cond. + IPTU + internet + luz", grupo:"Negócio (Nicolle)", venc:10, resp:"Nicolle" },
   { id:"financ-carro",  curto:"Financiamento", nome:"Financiamento do carro",               grupo:"Transporte",        venc:6,    resp:"Casa" },
   { id:"consorcio-400", curto:"Consórcio 400k", nome:"Consórcio (R$ 400 mil)",               grupo:"Investimento",      venc:null, vencNota:"data a confirmar", resp:"Casa" },
-  { id:"diarista",      curto:"Diarista", nome:"Diarista",                             grupo:"Serviços do Lar",   venc:null, vencNota:"durante o mês", resp:"Casa" },
+  { id:"diarista",      curto:"Diarista", nome:"Diarista + Mercia",                    grupo:"Serviços do Lar",   venc:null, vencNota:"durante o mês", resp:"Casa" },
   { id:"pix-geral",     curto:"Pix geral", nome:"Pix Geral",                            grupo:"Variáveis",         venc:null, vencNota:"durante o mês", resp:"Casa" },
   { id:"cartao-rico",   curto:"Rico", nome:"Cartão Rico",                          grupo:"Cartões",           venc:1,    resp:"Casa" },
   { id:"personal",      curto:"Personal", nome:"Personal Trainer",                     grupo:"Saúde e Bem-estar", venc:1,    resp:"Casa" },
@@ -382,26 +389,29 @@ const CONTAS_DEF = [
   { id:"luz",           curto:"Luz", nome:"Luz",                                  grupo:"Serviços do Lar",   venc:8,    resp:"Casa" },
   { id:"cartao-porto",  curto:"Porto", nome:"Cartão Porto Seguro",                  grupo:"Cartões",           venc:1,    resp:"Casa" },
   { id:"internet",      curto:"Internet", nome:"Internet",                             grupo:"Serviços do Lar",   venc:10,   resp:"Casa" },
+  { id:"compras-pix",   curto:"Compras no Pix", nome:"Compras gerais no Pix",                grupo:"Variáveis",         venc:null, vencNota:"durante o mês", resp:"Casa" },
 ];
-/* valores por conta, na ordem de MESES (set..mai). 0 = a conta não existe naquele mês. */
+/* valores por conta, na ordem de MESES (set/26..dez/27). 0 = a conta não existe naquele mês. */
 const VALORES = {
-  "aluguel-apto":  [19700,19700,19700,19700,19700,19700,19700,19700,19700],
-  "cartao-itau":   [0,32250.72,28959.12,3464,2058,1553,848,529,224],   /* out/26: 32.250,72 (paga 03/10) · nov/26: 28.959,12 (fatura PDF, vence 01/11) — planilha dizia 23.900 / 4.888 */
-  "cartao-nubank": [7240,7000,3678,3678,2378,2378,1715,1007,611],
-  "escola-miguel": [5957,5957,5957,5957,5957,5957,5957,5957,5957],
-  "sala-nicolle":  [3156.14,4000,4000,4000,3500,3500,3500,3500,3500],  /* set/26: valor real do boleto */
-  "financ-carro":  [2877,2877,2877,2877,2877,2877,2877,2877,2877],
-  "consorcio-400": [2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39],
-  "diarista":      [2430,2430,2430,2430,2430,2430,2430,2430,2430],
-  "pix-geral":     [1400,1500,1500,1500,1500,1500,1500,0,0],
-  "cartao-rico":   [1315,89,89,45,45,45,45,45,45],
-  "personal":      [900,900,900,900,900,900,900,900,900],
-  "pos-nicolle":   [848,848,848,848,848,848,848,848,848],
-  "consorcio-50":  [711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50,711.50],
-  "cartao-santa":  [644,649,546,426,0,0,0,0,0],
-  "luz":           [361.34,300,300,300,300,300,300,300,300],   /* set/26: valor real da conta (08/09) */
-  "cartao-porto":  [101,300,300,300,300,300,300,300,300],
-  "internet":      [156,166,166,166,166,166,166,166,166],      /* set/26: valor efetivamente pago */
+  /* set e out/26: valores já ajustados à mão (boletos reais). nov/26 → dez/27: planilha "Projeção Mensal" lida em 11/11/2026. */
+  "aluguel-apto":  [19700,19700,19700,19700,19700,19700,19700,19700,19700,19700,19700,19700,19700,19700,19700,19700],
+  "cartao-itau":   [0,32250.72,28959.12,19554.28,10726.92,3514,1426,841,452,360,244,153,97,0,0,0],
+  "cartao-nubank": [7240,7000,7530.7,6690.05,5390.05,4739.3,3716.67,2643.79,2248.07,1636.66,1636.66,1636.66,0,0,0,0],
+  "escola-miguel": [5957,5957,7725.85,7725.85,4724.42,4724.42,4724.42,6493.27,6493.27,6493.27,6493.27,6493.27,6493.27,6493.27,6493.27,6493.27],
+  "sala-nicolle":  [3156.14,4000,3184.69,3200,3500,3500,3500,3500,3500,3500,3500,3500,3500,3500,3500,3500],
+  "financ-carro":  [2877,2877,2877,2877,2877,2877,2877,2877,2877,2877,2877,2877,2877,0,0,0],
+  "consorcio-400": [2574.39,2574.39,2681.15,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39,2574.39],
+  "diarista":      [2430,2430,5580,5930,5930,5930,5930,5930,5930,5930,5930,5930,5930,5930,5930,5930],
+  "pix-geral":     [1400,1500,1500,1500,1000,1000,1000,1000,1500,0,0,0,0,0,0,0],
+  "cartao-rico":   [1315,89,743.78,743.78,44.9,44.9,44.9,44.9,44.9,44.9,44.9,44.9,44.9,44.9,44.9,44.9],
+  "personal":      [900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900],
+  "pos-nicolle":   [848,848,831.04,848,848,848,0,0,0,0,0,0,0,0,0,0],
+  "consorcio-50":  [711.5,711.5,744.09,744.09,744.09,744.09,744.09,744.09,744.09,744.09,744.09,744.09,744.09,744.09,744.09,744.09],
+  "cartao-santa":  [644,649,545.76,426.07,0,0,0,0,0,0,0,0,0,0,0,0],
+  "luz":           [361.34,300,474.2,450,500,500,500,500,500,500,500,500,500,500,500,500],
+  "cartao-porto":  [101,300,67.5,100,100,100,100,100,100,100,100,100,100,100,100,100],
+  "internet":      [156,166,156,156,156,156,156,156,156,156,156,156,156,156,156,156],
+  "compras-pix":   [0,0,0,0,1500,1500,1500,1500,1500,0,0,0,0,0,0,0],
 };
 /* cobranças e comprovantes oficiais embutidos pelo Claude, por "mesId:contaId":
    OFICIAL["2026-09:aluguel-apto"] = { cobranca:{tipo:"pix"|"barras"|"arquivo", texto?, dataUri?,
@@ -419,6 +429,22 @@ const OFICIAL = {
   "2026-10:cartao-itau":   { pago:true },
   /* fatura Itaú de novembro (R$ 28.959,12) — "Pagamento efetuado" 03/11, "Fatura paga" 05/11 no app */
   "2026-11:cartao-itau":   { pago:true },
+  /* novembro: células em verde na planilha "Projeção Mensal" em 11/11/2026 (verde = pago, dito pelo Tales).
+     Sem verde em novembro: Diarista + Mercia e Pix Geral. */
+  "2026-11:aluguel-apto":  { pago:true },
+  "2026-11:cartao-nubank": { pago:true },
+  "2026-11:escola-miguel": { pago:true },
+  "2026-11:sala-nicolle":  { pago:true },
+  "2026-11:financ-carro":  { pago:true },
+  "2026-11:consorcio-400": { pago:true },
+  "2026-11:cartao-rico":   { pago:true },
+  "2026-11:personal":      { pago:true },
+  "2026-11:pos-nicolle":   { pago:true },
+  "2026-11:consorcio-50":  { pago:true },
+  "2026-11:cartao-santa":  { pago:true },
+  "2026-11:luz":           { pago:true },
+  "2026-11:cartao-porto":  { pago:true },
+  "2026-11:internet":      { pago:true },
 };
 
 const CICLOS = [
@@ -1620,13 +1646,10 @@ function renderGeral(){
   document.getElementById('sub').textContent =
     `${MESES[0].label} a ${MESES[MESES.length-1].label}, pela planilha de projeção mensal`;
   document.getElementById('regras').innerHTML =
-    `<span class="rg">renda <b>${k0(MESES[0].renda)}</b> por mês</span><span class="rg"><b>${k0(MESES[MESES.length-1].renda)}</b> a partir de Jan/27</span>`+
+    `<span class="rg">renda de ${(MESES.find(m=>m.id===mesVigente())||MESES[0]).label}: <b>${k0((MESES.find(m=>m.id===mesVigente())||MESES[0]).renda)}</b></span>`+
     `<span class="rg">contas caem <b>${k0(primeiro-ultimo)}</b> até ${MESES[MESES.length-1].label}</span>`;
 
-  const rendas=[...new Set(MESES.map(m=>m.renda))];
-  document.getElementById('gerLegRenda').textContent = rendas.length>1
-    ? `renda prevista (${rendas.map(v=>(v/1000).toFixed(1).replace('.',',')+' mil').join(' → ')})`
-    : `renda prevista (${(rendas[0]/1000).toFixed(1).replace('.',',')} mil)`;
+  document.getElementById('gerLegRenda').textContent = 'renda prevista';
 
   document.getElementById('gerCards').innerHTML = `
     <div class="card"><div class="lbl">Maior mês</div><div class="val">${brl(totais[maiorI])}</div>
