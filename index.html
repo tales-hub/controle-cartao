@@ -236,7 +236,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 73 de 11/11/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 74 de 13/11/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -346,8 +346,8 @@
 
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
-const ATUALIZADO = "11/11/2026";
-const VERSAO     = "73";   // muda a cada publicação — o aviso de atualização compara este número
+const ATUALIZADO = "13/11/2026";
+const VERSAO     = "74";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -862,7 +862,18 @@ const CICLOS = [
       { data:"2026-11-10", desc:"Oba Hortifruti Leopoldina", quem:"Tales", valor:77.59, cat:"Mercado" },
       { data:"2026-11-10", desc:"Amazon Marketplace", quem:"Nicolle", valor:47.11, parc:{n:1,de:6,total:282.65}, cat:"Compras" },
       /* yuoolstore de 10/11 foi CANCELADA no app e refeita em 11/11 (mesmo valor) */
-      { data:"2026-11-11", desc:"App *yuoolstore", quem:"Tales", valor:90.95, parc:{n:1,de:8,total:727.59}, cat:"Compras" },
+      { data:"2026-11-11", desc:"App *yuoolstore", quem:"Tales", valor:91.01, parc:{n:1,de:8,total:728.08}, cat:"Compras" },
+      { data:"2026-11-11", desc:"Mercado Livre", quem:"Nicolle", valor:167.98, cat:"Compras" },
+      { data:"2026-11-11", desc:"Amazon Marketplace", quem:"Nicolle", valor:35.23, parc:{n:1,de:4,total:140.92}, cat:"Compras" },
+      { data:"2026-11-11", desc:"Italo Alunni", quem:"Tales", valor:105.00, cat:"Alimentação" },
+      { data:"2026-11-11", desc:"Badran", quem:"Tales", valor:35.00, cat:"Alimentação" },
+      { data:"2026-11-11", desc:"Adriano Alvino", quem:"Tales", valor:16.00, cat:"Mercado" },
+      { data:"2026-11-12", desc:"Sams Club", quem:"Tales", valor:595.42, cat:"Mercado" },
+      { data:"2026-11-12", desc:"Ec *linus", quem:"Nicolle", valor:104.70, parc:{n:1,de:3,total:314.10}, cat:"Compras" },
+      { data:"2026-11-12", desc:"Fabrique Pães Artesanais", quem:"Tales", valor:76.00, cat:"Mercado" },
+      { data:"2026-11-12", desc:"Amazon Prime Canais", quem:"Nicolle", valor:29.90, cat:"Assinaturas" },
+      { data:"2026-11-12", desc:"99food", quem:"Tales", valor:73.34, cat:"Alimentação" },
+      { data:"2026-11-13", desc:"iFood — NP Farma", quem:"Nicolle", valor:71.19, cat:"Saúde" },
     ]
   }
 ];
