@@ -139,7 +139,17 @@
   .btn-ghost{color:var(--accent);background:color-mix(in srgb,var(--accent) 11%,transparent);font-family:"Figtree",sans-serif;font-weight:700;font-size:12.5px;padding:8px 13px;border-radius:99px;letter-spacing:0}
 
   /* categorias */
-  .catrow{display:flex;align-items:center;gap:12px;padding:9px 0}
+  .catrow{display:flex;align-items:center;gap:12px;padding:9px 0;width:100%;text-align:left}
+  .catrow .seta{flex:none;width:18px;height:18px;color:var(--muted);transition:transform .2s}
+  .catrow .seta svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .catrow[aria-expanded=true] .seta{transform:rotate(90deg)}
+  .catrow .qt{font-weight:500;color:var(--muted);font-size:12px;margin-left:6px}
+  .catlist{margin:2px 0 10px 50px;padding:2px 12px;background:var(--panel2);border-radius:16px}
+  .catlist .ci{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;font-size:13.5px}
+  .catlist .ci+.ci{border-top:1px solid var(--line)}
+  .catlist .cd{min-width:0;overflow-wrap:anywhere;font-weight:600}
+  .catlist .cd small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);margin-top:1px}
+  .catlist .cv{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
   .catrow .tic{width:38px;height:38px;border-radius:13px}
   .catrow .cm{flex:1;min-width:0}
   .catrow .cl{display:flex;justify-content:space-between;gap:10px;font-size:14px;font-weight:600}
@@ -236,7 +246,7 @@
 
 <!-- marcador estático da versão: fica no HTML puro para dar para conferir a publicação
      de fora, sem executar JavaScript. Deve bater com a constante VERSAO no script. -->
-<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 74 de 13/11/2026</p>
+<p id="marcaVersao" style="position:absolute;left:-9999px;top:auto">marcador-de-publicacao versao 75 de 13/11/2026</p>
 
 <div id="gate">
   <div class="box">
@@ -347,7 +357,7 @@
 <script>
 /* ====== DADOS OFICIAIS (atualizados pelo Claude) ====== */
 const ATUALIZADO = "13/11/2026";
-const VERSAO     = "74";   // muda a cada publicação — o aviso de atualização compara este número
+const VERSAO     = "75";   // muda a cada publicação — o aviso de atualização compara este número
 
 /* Contas do mês — fonte: planilha "projecao mensal" (set./26 → mai./27).
    Cada fatura mensal cobre do dia 26 do mês anterior ao dia 25 do mês do rótulo. */
@@ -1400,21 +1410,31 @@ function desenharGrafico(c,DIAS,cotaDia,plano,porDiaMap,iHoje,dentro,encerrado,c
 }
 
 /* ---------- categorias ---------- */
+let catAberta=null;   /* categoria com a lista de gastos aberta (toque na linha abre e fecha) */
 function desenharCategorias(c,TODOS,gasto){
   const sec=document.getElementById('secCat');
   const com=TODOS.filter(l=>l.cat);
   if(!com.length){ sec.style.display='none'; return; }
   sec.style.display='block';
-  const tot={}; com.forEach(l=>{tot[l.cat]=(tot[l.cat]||0)+l.valor});
+  const tot={}, itens={};
+  com.forEach(l=>{ tot[l.cat]=(tot[l.cat]||0)+l.valor; (itens[l.cat]=itens[l.cat]||[]).push(l); });
   const ord=Object.entries(tot).sort((a,b)=>b[1]-a[1]);
   const max=ord[0][1];
   document.getElementById('cats').innerHTML = ord.map(([nome,v])=>{
-    const kk=ICO[slug(nome)]?slug(nome):'outros';
-    return `<div class="catrow c-${kk}">${icoCat(nome)}<div class="cm">`+
-      `<div class="cl"><span>${nome}</span><span>${brl(v)}</span></div>`+
-      `<div class="cbar"><i style="width:${(v/max*100).toFixed(1)}%"></i></div></div></div>`; }).join('')+
-    `<div class="note" style="margin-top:8px">As 3 maiores somam ${
+    const kk=ICO[slug(nome)]?slug(nome):'outros', aberta=catAberta===nome, n=itens[nome].length;
+    let h=`<button class="catrow c-${kk}" data-cat="${nome}" aria-expanded="${aberta}">${icoCat(nome)}<div class="cm">`+
+      `<div class="cl"><span>${nome}<span class="qt">${n} gasto${n===1?'':'s'}</span></span><span>${brl(v)}</span></div>`+
+      `<div class="cbar"><i style="width:${(v/max*100).toFixed(1)}%"></i></div></div>`+
+      `<span class="seta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>`;
+    if(aberta) h+=`<div class="catlist">`+itens[nome].slice().sort((a,b)=>b.data.localeCompare(a.data)||b.valor-a.valor).map(l=>
+      `<div class="ci"><span class="cd">${descDe(l)}<small>${fmtD(l.data)}, ${l.quem}</small></span><span class="cv">${brl(l.valor)}</span></div>`).join('')+`</div>`;
+    return h; }).join('')+
+    `<div class="note" style="margin-top:8px">Toque em uma categoria para ver os gastos dela. As 3 maiores somam ${
       (ord.slice(0,3).reduce((s,x)=>s+x[1],0)/gasto*100).toFixed(0)}% da fatura.</div>`;
+  document.querySelectorAll('#cats .catrow').forEach(b=>b.onclick=()=>{
+    catAberta = catAberta===b.dataset.cat ? null : b.dataset.cat;
+    desenharCategorias(c,TODOS,gasto);
+  });
 }
 
 /* ---------- extrato ---------- */
